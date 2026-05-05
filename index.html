@@ -10,332 +10,114 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body {
-      height: 100%;
-      font-family: 'Public Sans', sans-serif;
-      background: #f0f0f6;
-      color: #191346;
-    }
-
-    .app {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      max-width: 780px;
-      margin: 0 auto;
-      background: #fff;
-      box-shadow: 0 0 48px rgba(25,19,70,0.10);
-    }
-
-    .header {
-      background: #191346;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-shrink: 0;
-    }
-    .logo {
-      font-family: 'Poppins', sans-serif;
-      font-weight: 700;
-      font-size: 24px;
-      color: #F3703A;
-      letter-spacing: -0.5px;
-    }
-    .logo-tag {
-      font-family: 'Public Sans', sans-serif;
-      font-size: 11px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.5);
-      border-left: 1px solid rgba(255,255,255,0.18);
-      padding-left: 14px;
-      line-height: 1.5;
-    }
-
-    .chat-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      background: #f7f7f9;
-      scroll-behavior: smooth;
-    }
-
-    .msg {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      max-width: 90%;
-    }
+    html, body { height: 100%; font-family: 'Public Sans', sans-serif; background: #f0f0f6; color: #191346; }
+    .app { display: flex; flex-direction: column; height: 100vh; max-width: 780px; margin: 0 auto; background: #fff; box-shadow: 0 0 48px rgba(25,19,70,0.10); }
+    .header { background: #191346; padding: 14px 20px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+    .logo { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 24px; color: #F3703A; letter-spacing: -0.5px; }
+    .logo-tag { font-family: 'Public Sans', sans-serif; font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5); border-left: 1px solid rgba(255,255,255,0.18); padding-left: 14px; line-height: 1.5; }
+    .chat-area { flex: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 14px; background: #f7f7f9; scroll-behavior: smooth; }
+    .msg { display: flex; gap: 10px; align-items: flex-start; max-width: 90%; }
     .msg.user { align-self: flex-end; flex-direction: row-reverse; }
-    .msg.bot  { align-self: flex-start; }
-
-    .msg-avatar {
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 700; font-size: 12px;
-    }
-    .msg.bot  .msg-avatar { background: #F3703A; color: #fff; }
+    .msg.bot { align-self: flex-start; }
+    .msg-avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 12px; }
+    .msg.bot .msg-avatar { background: #F3703A; color: #fff; }
     .msg.user .msg-avatar { background: #191346; color: #fff; }
-
-    .msg-bubble {
-      padding: 11px 15px;
-      font-size: 14px;
-      line-height: 1.65;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .msg.bot .msg-bubble {
-      background: #fff;
-      color: #191346;
-      border: 0.5px solid #e0e0ec;
-      border-radius: 0 16px 16px 16px;
-    }
-    .msg.user .msg-bubble {
-      background: #F3703A;
-      color: #fff;
-      border-radius: 16px 0 16px 16px;
-    }
+    .msg-bubble { padding: 11px 15px; font-size: 14px; line-height: 1.65; white-space: pre-wrap; word-break: break-word; }
+    .msg.bot .msg-bubble { background: #fff; color: #191346; border: 0.5px solid #e0e0ec; border-radius: 0 16px 16px 16px; }
+    .msg.user .msg-bubble { background: #F3703A; color: #fff; border-radius: 16px 0 16px 16px; }
     .msg-bubble strong { font-weight: 600; }
-
-    .dl-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 14px;
-      padding: 10px 18px;
-      background: #191346;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-family: 'Poppins', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
-    }
-    .dl-btn:hover  { background: #F3703A; }
+    .dl-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 10px 18px; background: #191346; color: #fff; border: none; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+    .dl-btn:hover { background: #F3703A; }
     .dl-btn:active { transform: scale(0.97); }
     .dl-btn svg { fill: #fff; flex-shrink: 0; }
-
     .typing-dots { display: flex; align-items: center; gap: 4px; padding: 4px 0; }
-    .typing-dots span {
-      display: inline-block; width: 7px; height: 7px;
-      border-radius: 50%; background: #F3703A;
-      animation: tdot 1.2s infinite ease-in-out;
-    }
+    .typing-dots span { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #F3703A; animation: tdot 1.2s infinite ease-in-out; }
     .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
     .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes tdot {
-      0%,60%,100% { transform: translateY(0); opacity:.5; }
-      30% { transform: translateY(-7px); opacity:1; }
-    }
-
-    .chips-bar {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      padding: 10px 16px 6px;
-      background: #fff;
-      border-top: 1px solid #ebebf3;
-    }
-    .chip {
-      font-family: 'Public Sans', sans-serif;
-      font-size: 12px; font-weight: 500;
-      color: #191346; background: #f0f0f8;
-      border: 1px solid #dddde8; border-radius: 20px;
-      padding: 6px 13px; cursor: pointer;
-      transition: background .15s, border-color .15s, color .15s;
-      white-space: nowrap;
-    }
+    @keyframes tdot { 0%,60%,100% { transform: translateY(0); opacity:.5; } 30% { transform: translateY(-7px); opacity:1; } }
+    .chips-bar { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 16px 6px; background: #fff; border-top: 1px solid #ebebf3; }
+    .chip { font-family: 'Public Sans', sans-serif; font-size: 12px; font-weight: 500; color: #191346; background: #f0f0f8; border: 1px solid #dddde8; border-radius: 20px; padding: 6px 13px; cursor: pointer; transition: background .15s, border-color .15s, color .15s; white-space: nowrap; }
     .chip:hover { background: #F3703A; color: #fff; border-color: #F3703A; }
-
-    .input-bar {
-      display: flex; gap: 10px;
-      padding: 12px 16px 14px;
-      background: #fff;
-      border-top: 1px solid #ebebf3;
-      align-items: flex-end;
-      flex-shrink: 0;
-    }
-    .chat-input {
-      flex: 1;
-      border: 1px solid #dddde8; border-radius: 22px;
-      padding: 10px 16px;
-      font-family: 'Public Sans', sans-serif; font-size: 14px; line-height: 1.5;
-      resize: none; outline: none;
-      min-height: 44px; max-height: 130px; overflow-y: auto;
-      color: #191346; background: #f7f7fb;
-      transition: border-color .15s, background .15s;
-    }
+    .input-bar { display: flex; gap: 10px; padding: 12px 16px 14px; background: #fff; border-top: 1px solid #ebebf3; align-items: flex-end; flex-shrink: 0; }
+    .chat-input { flex: 1; border: 1px solid #dddde8; border-radius: 22px; padding: 10px 16px; font-family: 'Public Sans', sans-serif; font-size: 14px; line-height: 1.5; resize: none; outline: none; min-height: 44px; max-height: 130px; overflow-y: auto; color: #191346; background: #f7f7fb; transition: border-color .15s, background .15s; }
     .chat-input::placeholder { color: #aaa; }
     .chat-input:focus { border-color: #F3703A; background: #fff; }
-
-    .send-btn {
-      width: 44px; height: 44px; border-radius: 50%;
-      background: #F3703A; border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      transition: background .15s, transform .1s;
-    }
-    .send-btn:hover  { background: #e05e28; }
+    .send-btn { width: 44px; height: 44px; border-radius: 50%; background: #F3703A; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .15s, transform .1s; }
+    .send-btn:hover { background: #e05e28; }
     .send-btn:active { transform: scale(.94); }
     .send-btn:disabled { background: #ccc; cursor: not-allowed; }
     .send-btn svg { fill: #fff; display: block; }
-
-    .footer {
-      text-align: center; font-size: 11px; color: #aaa;
-      padding: 6px 16px 10px;
-      background: #fff; border-top: 1px solid #f0f0f6;
-      flex-shrink: 0;
-    }
-
+    .footer { text-align: center; font-size: 11px; color: #aaa; padding: 6px 16px 10px; background: #fff; border-top: 1px solid #f0f0f6; flex-shrink: 0; }
     .chat-area::-webkit-scrollbar { width: 5px; }
     .chat-area::-webkit-scrollbar-track { background: transparent; }
     .chat-area::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
-
-    @media (max-width: 480px) {
-      .msg { max-width: 96%; }
-      .logo { font-size: 20px; }
-    }
+    @media (max-width: 480px) { .msg { max-width: 96%; } .logo { font-size: 20px; } }
   </style>
 </head>
 <body>
 <div class="app">
-
   <div class="header">
     <div class="logo">xtay</div>
     <div class="logo-tag">Calculadora de Enxoval<br>Estadias Inteligentes</div>
   </div>
-
   <div class="chat-area" id="chat"></div>
-
   <div class="chips-bar" id="chipsBar">
     <span class="chip" onclick="sendChip('Quero calcular o enxoval de um novo empreendimento')">🛏 Calcular enxoval</span>
     <span class="chip" onclick="sendChip('Quais são os fornecedores oficiais Xtay?')">🏭 Fornecedores</span>
     <span class="chip" onclick="sendChip('Qual o padrão dos lençóis Xtay?')">📋 Padrão têxtil</span>
     <span class="chip" onclick="sendChip('Como funciona o fator de giro?')">🔄 Fator de giro</span>
   </div>
-
   <div class="input-bar">
-    <textarea class="chat-input" id="inp"
-      placeholder="Descreva o empreendimento ou faça uma pergunta..."
-      rows="1"
-      onkeydown="handleKey(event)"
-      oninput="autoResize(this)"></textarea>
+    <textarea class="chat-input" id="inp" placeholder="Descreva o empreendimento ou faça uma pergunta..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
     <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Enviar">
       <svg width="18" height="18" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
     </button>
   </div>
-
-  <div class="footer">Xtay Smart Hotel &mdash; Uso interno &mdash; v2.0</div>
+  <div class="footer">Xtay Smart Hotel &mdash; Uso interno &mdash; v3.0</div>
 </div>
 
 <script>
-const SYSTEM_PROMPT = `Você é a Calculadora de Enxoval da Xtay Smart Hotel. Ajude colaboradores a dimensionar o enxoval de empreendimentos com precisão.
+const ITENS_TABELA = {
+  'PROTETOR COLCHÃO QUEEN': { preco: 76, giro: 1.2, qtd: 1, tipo: 'queen' },
+  'LENÇOL QUEEN': { preco: 60, giro: 3, qtd: 2, tipo: 'queen' },
+  'EDREDON QUEEN': { preco: 180, giro: 1.2, qtd: 1, tipo: 'queen' },
+  'CAPA EDREDON QUEEN': { preco: 130, giro: 3, qtd: 1, tipo: 'queen' },
+  'COBERTOR QUEEN': { preco: 130, giro: 1.2, qtd: 1, tipo: 'queen' },
+  'TRAVESSEIRO QUEEN': { preco: 75, giro: 1.2, qtd: 2, tipo: 'queen' },
+  'PROTETOR TRAVESSEIRO QUEEN': { preco: 13, giro: 1.2, qtd: 2, tipo: 'queen' },
+  'FRONHA QUEEN': { preco: 12, giro: 3, qtd: 2, tipo: 'queen' },
+  'PROTETOR COLCHÃO SOLTEIRO': { preco: 76, giro: 1.2, qtd: 1, tipo: 'solteiro' },
+  'LENÇOL SOLTEIRO': { preco: 60, giro: 3, qtd: 2, tipo: 'solteiro' },
+  'EDREDON SOLTEIRO': { preco: 180, giro: 1.2, qtd: 1, tipo: 'solteiro' },
+  'CAPA EDREDON SOLTEIRO': { preco: 130, giro: 3, qtd: 1, tipo: 'solteiro' },
+  'COBERTOR SOLTEIRO': { preco: 130, giro: 1.2, qtd: 1, tipo: 'solteiro' },
+  'TRAVESSEIRO SOLTEIRO': { preco: 75, giro: 1.2, qtd: 1, tipo: 'solteiro' },
+  'PROTETOR TRAVESSEIRO SOLTEIRO': { preco: 13, giro: 1.2, qtd: 1, tipo: 'solteiro' },
+  'FRONHA SOLTEIRO': { preco: 12, giro: 3, qtd: 1, tipo: 'solteiro' },
+  'LENÇOL SOFÁ CAMA': { preco: 60, giro: 3, qtd: 2, tipo: 'sofa' },
+  'COBERTOR SOFÁ CAMA': { preco: 130, giro: 1.2, qtd: 1, tipo: 'sofa' },
+  'TRAVESSEIRO SOFÁ CAMA': { preco: 75, giro: 1.2, qtd: 1, tipo: 'sofa' },
+  'PROTETOR TRAVESSEIRO SOFÁ CAMA': { preco: 13, giro: 1.2, qtd: 1, tipo: 'sofa' },
+  'TOALHA BANHO': { preco: 56, giro: 3, qtd: 0, tipo: 'toalha' },
+  'TOALHA ROSTO': { preco: 18, giro: 3, qtd: 0, tipo: 'toalha' },
+  'TOALHA PISO': { preco: 17, giro: 3, qtd: 0, tipo: 'toalha' }
+};
 
-TABELA DE ITENS:
-Item | R$ Unit | Giro | Qtd por unidade
-PROTETOR COLCHÃO QUEEN | 76 | 1.2 | 1 por cama queen
-LENÇOL QUEEN | 60 | 3 | 2 por cama queen
-EDREDON QUEEN | 180 | 1.2 | 1 por cama queen
-CAPA EDREDON QUEEN | 130 | 3 | 1 por cama queen
-COBERTOR QUEEN | 130 | 1.2 | 1 por cama queen
-TRAVESSEIRO QUEEN | 75 | 1.2 | 2 por cama queen
-PROTETOR TRAVESSEIRO QUEEN | 13 | 1.2 | 2 por cama queen
-FRONHA QUEEN | 12 | 3 | 2 por cama queen
-PROTETOR COLCHÃO SOLTEIRO | 76 | 1.2 | 1 por cama solteiro
-LENÇOL SOLTEIRO | 60 | 3 | 2 por cama solteiro
-EDREDON SOLTEIRO | 180 | 1.2 | 1 por cama solteiro
-CAPA EDREDON SOLTEIRO | 130 | 3 | 1 por cama solteiro
-COBERTOR SOLTEIRO | 130 | 1.2 | 1 por cama solteiro
-TRAVESSEIRO SOLTEIRO | 75 | 1.2 | 1 por cama solteiro
-PROTETOR TRAVESSEIRO SOLTEIRO | 13 | 1.2 | 1 por cama solteiro
-FRONHA SOLTEIRO | 12 | 3 | 1 por cama solteiro
-LENÇOL SOFÁ CAMA | 60 | 3 | 2 por sofá-cama
-COBERTOR SOFÁ CAMA | 130 | 1.2 | 1 por sofá-cama
-TRAVESSEIRO SOFÁ CAMA | 75 | 1.2 | 1 por sofá-cama
-PROTETOR TRAVESSEIRO SOFÁ CAMA | 13 | 1.2 | 1 por sofá-cama
-TOALHA BANHO | 56 | 3 | máx pessoas por apto
-TOALHA ROSTO | 18 | 3 | máx pessoas por apto
-TOALHA PISO | 17 | 3 | qtd banheiros por apto
-
-FÓRMULA: Qtd Total = Qtd_por_unidade × Qtd_unidades_no_apto × Num_aptos × Fator_giro
-
-REGRA TOALHAS:
-- Banho e Rosto = máximo de pessoas por apto (Queen=2, Solteiro=1, Sofá=2 — soma dos máximos)
-- Piso = número de banheiros
-
-TIPOLOGIAS TÍPICAS:
-- Studio: 1 Queen, 1 banheiro
-- 1 Dorm: 1 Queen, 1 banheiro (pode ter sofá-cama)
-- 2 Dorm: 1 Queen + 1 Solteiro ou 2 Solteiros, 1-2 banheiros
-- 3 Dorm: 1 Queen + 2 Solteiros, 2 banheiros
-
-FORNECEDORES OFICIAIS:
-1. Maxlink Têxtil — maxlink.com.br — Ernesto: +55 11 99203-7376
-2. Altenburg Linha Hotel — altenburg.com.br/linha-hotel — Rui: +55 47 9982-7715
-
-INSTRUÇÕES CRÍTICAS:
-1. Quando fizer um cálculo de enxoval completo, inclua OBRIGATORIAMENTE ao final da resposta um bloco JSON entre as tags ===EXCEL_DATA_START=== e ===EXCEL_DATA_END===
-2. O bloco JSON deve seguir EXATAMENTE este formato:
-
-===EXCEL_DATA_START===
-{
-  "empreendimento": "nome ou descrição do empreendimento",
-  "data": "DD/MM/AAAA",
-  "tipologias": [
-    {
-      "nome": "STUDIO",
-      "aptos": 10,
-      "banheiros": 1,
-      "queen": 1,
-      "solteiro": 0,
-      "sofa": 0,
-      "itens": [
-        { "item": "PROTETOR COLCHÃO QUEEN", "qtd": 12, "unitario": 76, "total": 912 }
-      ],
-      "subtotal": 912
-    }
-  ],
-  "resumo": [
-    { "item": "PROTETOR COLCHÃO QUEEN", "qtd_total": 12, "unitario": 76, "total": 912 }
-  ],
-  "total_pecas": 100,
-  "total_investimento": 15000
-}
-===EXCEL_DATA_END===
-
-3. Responda SEMPRE em português do Brasil
-4. Exiba o cálculo em texto legível ANTES do bloco JSON
-5. Ao final de qualquer cálculo, mencione os fornecedores`;
-
-let history = [];
 let chipsHidden = false;
 
 function addMessage(role, text, withExcel) {
   const chat = document.getElementById('chat');
   const wrap = document.createElement('div');
   wrap.className = 'msg ' + role;
-
   const avatar = document.createElement('div');
   avatar.className = 'msg-avatar';
   avatar.textContent = role === 'bot' ? 'X' : 'VC';
-
   const bubble = document.createElement('div');
   bubble.className = 'msg-bubble';
-
-  const cleanText = text.replace(/===EXCEL_DATA_START===[\s\S]*?===EXCEL_DATA_END===/g, '').trim();
-
-  bubble.innerHTML = cleanText
+  bubble.innerHTML = text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
     .replace(/\n/g,'<br>');
-
   if (withExcel) {
     const br = document.createElement('br');
     const btn = document.createElement('button');
@@ -345,7 +127,6 @@ function addMessage(role, text, withExcel) {
     bubble.appendChild(br);
     bubble.appendChild(btn);
   }
-
   wrap.appendChild(avatar);
   wrap.appendChild(bubble);
   chat.appendChild(wrap);
@@ -383,246 +164,229 @@ function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
-function extractExcelData(text) {
-  const match = text.match(/===EXCEL_DATA_START===([\s\S]*?)===EXCEL_DATA_END===/);
-  if (!match) return null;
-  try { return JSON.parse(match[1].trim()); }
-  catch(e) { console.warn('JSON parse error:', e); return null; }
+function processarTexto(text) {
+  text = text.toLowerCase();
+  
+  if (text.includes('fornecedor')) {
+    return {
+      resposta: `**Fornecedores Oficiais Xtay:**\n\n1. **Maxlink Têxtil**\n   Site: www.maxlink.com.br\n   Contato: Ernesto\n   Fone: +55 11 99203-7376\n\n2. **Altenburg Linha Hotel**\n   Site: www.altenburg.com.br/linha-hotel\n   Contato: Rui\n   Fone: +55 47 9982-7715`,
+      excel: null
+    };
+  }
+  
+  if (text.includes('padrão') || text.includes('lençol')) {
+    return {
+      resposta: `**Padrão Têxtil Xtay:**\n\n- **Lençóis**: 2 por cama (cobertura de 3x)\n- **Edredons/Cobertores**: 1 por cama (rotação 1.2x)\n- **Travesseiros**: 1-2 por cama (rotação 1.2x)\n- **Fronhas**: 2 por cama (cobertura de 3x)\n\nO padrão garante conforto e durabilidade com rotação eficiente.`,
+      excel: null
+    };
+  }
+  
+  if (text.includes('giro') || text.includes('fator')) {
+    return {
+      resposta: `**Fator de Giro Xtay:**\n\n- **Giro 3x**: Itens de rotação rápida (lençóis, fronhas, toalhas)\n- **Giro 1.2x**: Itens de rotação lenta (edredons, cobertores, protetores)\n\n**Fórmula:** Quantidade = Item/Cama × Camas × Apts × Fator de Giro\n\nEx: 2 lençóis × 1 queen × 10 aptos × 3 = 60 lençóis`,
+      excel: null
+    };
+  }
+  
+  // Tentar extrair números para cálculo
+  const numeros = text.match(/\d+/g) || [];
+  if (numeros.length > 0 || text.includes('calcula')) {
+    return calcularEnxoval(text);
+  }
+  
+  return {
+    resposta: `Desculpe, não entendi. Você pode:\n\n1. Descrever um empreendimento: "10 studios, 5 aptos 2 dorm"\n2. Perguntar sobre fornecedores ou padrões\n3. Usar um dos atalhos rápidos acima`,
+    excel: null
+  };
+}
+
+function calcularEnxoval(text) {
+  const parts = text.split(/[,;ou]/);
+  let tipologias = [];
+  let totalPecas = 0;
+  let totalInvest = 0;
+  let resumo = {};
+  
+  parts.forEach(part => {
+    const match = part.match(/(\d+)\s*(?:studio|studios|apto|aptos|1\s*dorm|2\s*dorm|3\s*dorm)/i);
+    if (!match) return;
+    
+    const qtd = parseInt(match[1]);
+    const tipo = match[0].toLowerCase();
+    let config = { nome: '', queens: 0, solteiros: 0, sofas: 0, banheiros: 1 };
+    
+    if (tipo.includes('studio')) {
+      config = { nome: 'STUDIO', queens: 1, solteiros: 0, sofas: 0, banheiros: 1 };
+    } else if (tipo.includes('1 dorm')) {
+      config = { nome: '1 DORMITÓRIO', queens: 1, solteiros: 0, sofas: 0, banheiros: 1 };
+    } else if (tipo.includes('2 dorm')) {
+      config = { nome: '2 DORMITÓRIOS', queens: 1, solteiros: 1, sofas: 0, banheiros: 2 };
+    } else if (tipo.includes('3 dorm')) {
+      config = { nome: '3 DORMITÓRIOS', queens: 1, solteiros: 2, sofas: 0, banheiros: 2 };
+    }
+    
+    let itensApto = [];
+    let subtotal = 0;
+    
+    // Queens
+    for (let i = 0; i < config.queens; i++) {
+      ['PROTETOR COLCHÃO QUEEN', 'LENÇOL QUEEN', 'EDREDON QUEEN', 'CAPA EDREDON QUEEN', 'COBERTOR QUEEN', 'TRAVESSEIRO QUEEN', 'PROTETOR TRAVESSEIRO QUEEN', 'FRONHA QUEEN'].forEach(item => {
+        const info = ITENS_TABELA[item];
+        const qtdItem = info.qtd * qtd * info.giro;
+        const totalItem = qtdItem * info.preco;
+        itensApto.push({ item, qtd: Math.ceil(qtdItem), unitario: info.preco, total: Math.ceil(totalItem) });
+        resumo[item] = (resumo[item] || 0) + Math.ceil(qtdItem);
+        totalPecas += Math.ceil(qtdItem);
+        subtotal += Math.ceil(totalItem);
+      });
+    }
+    
+    // Solteiros
+    for (let i = 0; i < config.solteiros; i++) {
+      ['PROTETOR COLCHÃO SOLTEIRO', 'LENÇOL SOLTEIRO', 'EDREDON SOLTEIRO', 'CAPA EDREDON SOLTEIRO', 'COBERTOR SOLTEIRO', 'TRAVESSEIRO SOLTEIRO', 'PROTETOR TRAVESSEIRO SOLTEIRO', 'FRONHA SOLTEIRO'].forEach(item => {
+        const info = ITENS_TABELA[item];
+        const qtdItem = info.qtd * qtd * info.giro;
+        const totalItem = qtdItem * info.preco;
+        itensApto.push({ item, qtd: Math.ceil(qtdItem), unitario: info.preco, total: Math.ceil(totalItem) });
+        resumo[item] = (resumo[item] || 0) + Math.ceil(qtdItem);
+        totalPecas += Math.ceil(qtdItem);
+        subtotal += Math.ceil(totalItem);
+      });
+    }
+    
+    // Toalhas
+    const pessoareas = (config.queens * 2) + (config.solteiros * 1);
+    ['TOALHA BANHO', 'TOALHA ROSTO'].forEach(item => {
+      const info = ITENS_TABELA[item];
+      const qtdItem = pessoareas * qtd * info.giro;
+      const totalItem = qtdItem * info.preco;
+      itensApto.push({ item, qtd: Math.ceil(qtdItem), unitario: info.preco, total: Math.ceil(totalItem) });
+      resumo[item] = (resumo[item] || 0) + Math.ceil(qtdItem);
+      totalPecas += Math.ceil(qtdItem);
+      subtotal += Math.ceil(totalItem);
+    });
+    
+    const item = ITENS_TABELA['TOALHA PISO'];
+    const qtdToalhaPiso = config.banheiros * qtd * item.giro;
+    const totalToalhaPiso = qtdToalhaPiso * item.preco;
+    itensApto.push({ item: 'TOALHA PISO', qtd: Math.ceil(qtdToalhaPiso), unitario: item.preco, total: Math.ceil(totalToalhaPiso) });
+    resumo['TOALHA PISO'] = (resumo['TOALHA PISO'] || 0) + Math.ceil(qtdToalhaPiso);
+    totalPecas += Math.ceil(qtdToalhaPiso);
+    subtotal += Math.ceil(totalToalhaPiso);
+    
+    tipologias.push({
+      nome: config.nome,
+      aptos: qtd,
+      banheiros: config.banheiros,
+      queen: config.queens,
+      solteiro: config.solteiros,
+      sofa: 0,
+      itens: itensApto,
+      subtotal: Math.ceil(subtotal)
+    });
+    
+    totalInvest += Math.ceil(subtotal);
+  });
+  
+  if (tipologias.length === 0) {
+    return {
+      resposta: `Não consegui identificar o empreendimento. Tente:\n"10 studios, 5 aptos 2 dormitórios"`,
+      excel: null
+    };
+  }
+  
+  const resumoArray = Object.entries(resumo).map(([item, qtd]) => ({
+    item,
+    qtd_total: qtd,
+    unitario: ITENS_TABELA[item].preco,
+    total: qtd * ITENS_TABELA[item].preco
+  }));
+  
+  const excelData = {
+    empreendimento: 'Cálculo Xtay',
+    data: new Date().toLocaleDateString('pt-BR'),
+    tipologias,
+    resumo: resumoArray,
+    total_pecas: totalPecas,
+    total_investimento: totalInvest
+  };
+  
+  const resposta = `**Cálculo do Enxoval Xtay**\n\n${tipologias.map(t => `**${t.nome}**: ${t.aptos} aptos | R$ ${t.subtotal.toLocaleString('pt-BR')}`).join('\n')}\n\n**Total de Peças**: ${totalPecas}\n**Investimento Estimado**: R$ ${totalInvest.toLocaleString('pt-BR')}\n\n**Fornecedores Oficiais**: Maxlink Têxtil (+55 11 99203-7376) | Altenburg (+55 47 9982-7715)`;
+  
+  return { resposta, excel: excelData };
 }
 
 function gerarExcel(data) {
   const wb = XLSX.utils.book_new();
-
-  const LARANJA  = 'FFF3703A';
-  const AZUL     = 'FF191346';
-  const BRANCO   = 'FFFFFFFF';
-  const CINZA_CL = 'FFF5F5F8';
-  const BORDA    = 'FFE0E0EC';
-
-  const border = {
-    top:    { style:'thin', color:{ rgb: BORDA } },
-    bottom: { style:'thin', color:{ rgb: BORDA } },
-    left:   { style:'thin', color:{ rgb: BORDA } },
-    right:  { style:'thin', color:{ rgb: BORDA } }
-  };
-
-  const hdr = (bg, fg, bold) => ({
-    font: { name:'Arial', sz:11, bold:!!bold, color:{ rgb: fg||BRANCO } },
-    fill: { fgColor:{ rgb: bg||AZUL } },
-    alignment: { horizontal:'center', vertical:'center', wrapText:true },
-    border
+  const LARANJA = 'FFF3703A', AZUL = 'FF191346', BRANCO = 'FFFFFFFF', CINZA = 'FFF5F5F8', BORDA = 'FFE0E0EC';
+  const border = { top: { style:'thin', color:{ rgb: BORDA } }, bottom: { style:'thin', color:{ rgb: BORDA } }, left: { style:'thin', color:{ rgb: BORDA } }, right: { style:'thin', color:{ rgb: BORDA } } };
+  const hdr = (bg, fg, bold) => ({ font: { name:'Arial', sz:11, bold:!!bold, color:{ rgb: fg||BRANCO } }, fill: { fgColor:{ rgb: bg||AZUL } }, alignment: { horizontal:'center', vertical:'center', wrapText:true }, border });
+  const cell = (bold, bg) => ({ font: { name:'Arial', sz:10, bold:!!bold, color:{ rgb: AZUL } }, fill: { fgColor:{ rgb: bg||BRANCO } }, alignment: { vertical:'center', wrapText:true }, border });
+  const num = (bold, bg) => ({ ...cell(bold, bg), alignment: { horizontal:'right', vertical:'center' }, numFmt: '#,##0' });
+  const brl = (bold, bg) => ({ ...cell(bold, bg), alignment: { horizontal:'right', vertical:'center' }, numFmt: 'R$ #,##0.00' });
+  
+  function sc(ws, addr, v, s) { ws[addr] = { v, t: typeof v === 'number' ? 'n' : 's' }; if (s) ws[addr].s = s; }
+  
+  // RESUMO
+  const wsResumo = {};
+  let r = 1;
+  sc(wsResumo, `A${r}`, 'RESUMO GERAL — ENXOVAL XTAY', hdr(AZUL, BRANCO, true));
+  r += 2;
+  ['ITEM', 'QTD TOTAL', 'R$ UNITÁRIO', 'R$ TOTAL'].forEach((h, i) => sc(wsResumo, String.fromCharCode(65+i) + r, h, hdr(LARANJA, BRANCO, true)));
+  r++;
+  data.resumo.forEach((item, idx) => {
+    const bg = idx % 2 === 0 ? BRANCO : CINZA;
+    sc(wsResumo, `A${r}`, item.item, cell(false, bg));
+    sc(wsResumo, `B${r}`, item.qtd_total, num(false, bg));
+    sc(wsResumo, `C${r}`, item.unitario, brl(false, bg));
+    sc(wsResumo, `D${r}`, item.total, brl(false, bg));
+    r++;
   });
-
-  const cell = (bold, bg) => ({
-    font: { name:'Arial', sz:10, bold:!!bold, color:{ rgb: AZUL } },
-    fill: { fgColor:{ rgb: bg||BRANCO } },
-    alignment: { vertical:'center', wrapText:true },
-    border
-  });
-
-  const num = (bold, bg) => ({
-    ...cell(bold, bg),
-    alignment: { horizontal:'right', vertical:'center' },
-    numFmt: '#,##0'
-  });
-
-  const brl = (bold, bg) => ({
-    ...cell(bold, bg),
-    alignment: { horizontal:'right', vertical:'center' },
-    numFmt: 'R$ #,##0.00'
-  });
-
-  function sc(ws, addr, v, s) {
-    ws[addr] = { v, t: typeof v === 'number' ? 'n' : 's' };
-    if (s) ws[addr].s = s;
-  }
-
-  function catItem(nome) {
-    if (nome.includes('TOALHA')) return 'Banho';
-    if (nome.includes('SOFÁ') || nome.includes('SOFA')) return 'Sofá-Cama';
-    if (nome.includes('SOLTEIRO')) return 'Cama Solteiro';
-    if (nome.includes('TRAVESSEIRO') || nome.includes('FRONHA')) return 'Travesseiro/Fronha';
-    return 'Cama Queen';
-  }
-
-  // ── ABA RESUMO ──
-  (function() {
+  r++;
+  sc(wsResumo, `A${r}`, 'TOTAL DE PEÇAS', hdr(AZUL, BRANCO, true));
+  sc(wsResumo, `D${r}`, data.total_pecas, { ...num(true), font:{name:'Arial',sz:12,bold:true,color:{rgb:BRANCO}}, fill:{fgColor:{rgb:AZUL}}, alignment:{horizontal:'center',vertical:'center'}, border });
+  r++;
+  sc(wsResumo, `A${r}`, 'INVESTIMENTO TOTAL', hdr(LARANJA, BRANCO, true));
+  sc(wsResumo, `D${r}`, data.total_investimento, { ...brl(true), font:{name:'Arial',sz:12,bold:true,color:{rgb:BRANCO}}, fill:{fgColor:{rgb:LARANJA}}, alignment:{horizontal:'center',vertical:'center'}, border });
+  wsResumo['!ref'] = `A1:D${r}`;
+  wsResumo['!cols'] = [{wch:36},{wch:14},{wch:16},{wch:18}];
+  XLSX.utils.book_append_sheet(wb, wsResumo, 'RESUMO');
+  
+  data.tipologias.forEach(tip => {
     const ws = {};
-    const merges = [];
     let r = 1;
-
-    sc(ws, `A${r}`, 'RESUMO GERAL — ENXOVAL XTAY', hdr(AZUL, BRANCO, true));
-    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:4} });
-    r++;
-
-    sc(ws, `A${r}`, 'Empreendimento: ' + (data.empreendimento || '—'), cell(true, CINZA_CL));
-    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:4} });
-    r++;
-
-    const hoje = data.data || new Date().toLocaleDateString('pt-BR');
-    sc(ws, `A${r}`, 'Data: ' + hoje, cell(false, CINZA_CL));
-    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:4} });
-    r += 2;
-
-    ['ITEM', 'QTD TOTAL', 'R$ UNITÁRIO', 'R$ TOTAL', 'CATEGORIA'].forEach((h, i) => {
-      sc(ws, String.fromCharCode(65+i) + r, h, hdr(LARANJA, BRANCO, true));
-    });
-    r++;
-
-    (data.resumo || []).forEach((item, idx) => {
-      const bg = idx % 2 === 0 ? BRANCO : CINZA_CL;
-      sc(ws, `A${r}`, item.item,      cell(false, bg));
-      sc(ws, `B${r}`, item.qtd_total, num(false, bg));
-      sc(ws, `C${r}`, item.unitario,  brl(false, bg));
-      sc(ws, `D${r}`, item.total,     brl(false, bg));
-      sc(ws, `E${r}`, catItem(item.item), cell(false, bg));
-      r++;
-    });
-
-    r++;
-    sc(ws, `A${r}`, 'TOTAL DE PEÇAS', hdr(AZUL, BRANCO, true));
-    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:3} });
-    sc(ws, `E${r}`, data.total_pecas || 0, { ...num(true), font:{name:'Arial',sz:12,bold:true,color:{rgb:BRANCO}}, fill:{fgColor:{rgb:AZUL}}, alignment:{horizontal:'center',vertical:'center'}, border });
-    r++;
-
-    sc(ws, `A${r}`, 'INVESTIMENTO TOTAL ESTIMADO', hdr(LARANJA, BRANCO, true));
-    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:3} });
-    sc(ws, `E${r}`, data.total_investimento || 0, { ...brl(true), font:{name:'Arial',sz:12,bold:true,color:{rgb:BRANCO}}, fill:{fgColor:{rgb:LARANJA}}, alignment:{horizontal:'center',vertical:'center'}, border });
-
-    ws['!merges'] = merges;
-    ws['!ref'] = `A1:E${r}`;
-    ws['!cols'] = [{wch:36},{wch:14},{wch:16},{wch:18},{wch:20}];
-    ws['!rows'] = Array(r).fill({hpt:20});
-
-    XLSX.utils.book_append_sheet(wb, ws, 'RESUMO');
-  })();
-
-  // ── ABAS TIPOLOGIA ──
-  (data.tipologias || []).forEach(tip => {
-    const ws = {};
-    const merges = [];
-    let r = 1;
-
     sc(ws, `A${r}`, tip.nome + ' — Enxoval Detalhado', hdr(AZUL, BRANCO, true));
-    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:3} });
+    r += 2;
+    ['ITEM','QTD TOTAL','R$ UNITÁRIO','R$ TOTAL'].forEach((h,i) => sc(ws, String.fromCharCode(65+i)+r, h, hdr(LARANJA, BRANCO, true)));
     r++;
-
-    [
-      ['Qtd de Apartamentos', tip.aptos],
-      ['Banheiros por Apto',  tip.banheiros],
-      ['Camas Queen',         tip.queen],
-      ['Camas Solteiro',      tip.solteiro],
-      ['Sofás-Cama',          tip.sofa]
-    ].forEach(([k,v]) => {
-      sc(ws, `A${r}`, k, cell(true, CINZA_CL));
-      sc(ws, `B${r}`, v, num(false, CINZA_CL));
-      merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:0} });
-      r++;
-    });
-    r++;
-
-    ['ITEM','QTD TOTAL','R$ UNITÁRIO','R$ TOTAL'].forEach((h,i) => {
-      sc(ws, String.fromCharCode(65+i)+r, h, hdr(LARANJA, BRANCO, true));
-    });
-    r++;
-
-    (tip.itens || []).forEach((item, idx) => {
-      const bg = idx % 2 === 0 ? BRANCO : CINZA_CL;
-      sc(ws, `A${r}`, item.item,     cell(false, bg));
-      sc(ws, `B${r}`, item.qtd,      num(false, bg));
+    tip.itens.forEach((item, idx) => {
+      const bg = idx % 2 === 0 ? BRANCO : CINZA;
+      sc(ws, `A${r}`, item.item, cell(false, bg));
+      sc(ws, `B${r}`, item.qtd, num(false, bg));
       sc(ws, `C${r}`, item.unitario, brl(false, bg));
-      sc(ws, `D${r}`, item.total,    brl(false, bg));
+      sc(ws, `D${r}`, item.total, brl(false, bg));
       r++;
     });
-
     r++;
-    sc(ws, `A${r}`, 'SUBTOTAL ' + tip.nome, hdr(AZUL, BRANCO, true));
-    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:2} });
-    sc(ws, `D${r}`, tip.subtotal || 0, { ...brl(true), font:{name:'Arial',sz:11,bold:true,color:{rgb:BRANCO}}, fill:{fgColor:{rgb:AZUL}}, alignment:{horizontal:'right',vertical:'center'}, border });
-
-    ws['!merges'] = merges;
+    sc(ws, `A${r}`, 'SUBTOTAL', hdr(AZUL, BRANCO, true));
+    sc(ws, `D${r}`, tip.subtotal, { ...brl(true), font:{name:'Arial',sz:11,bold:true,color:{rgb:BRANCO}}, fill:{fgColor:{rgb:AZUL}}, alignment:{horizontal:'right',vertical:'center'}, border });
     ws['!ref'] = `A1:D${r}`;
     ws['!cols'] = [{wch:36},{wch:14},{wch:16},{wch:18}];
-    ws['!rows'] = Array(r).fill({hpt:20});
-
     XLSX.utils.book_append_sheet(wb, ws, tip.nome.substring(0,31));
   });
-
-  // ── ABA FORNECEDORES ──
-  (function() {
-    const ws = {};
-    const merges = [];
-    let r = 1;
-
-    sc(ws, `A${r}`, 'FORNECEDORES OFICIAIS XTAY', hdr(AZUL, BRANCO, true));
-    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:2} });
-    r += 2;
-
-    sc(ws, `A${r}`, 'Maxlink Têxtil', hdr(LARANJA, BRANCO, true));
-    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:2} });
-    r++;
-    [['Site','www.maxlink.com.br'],['Contato','Ernesto'],['Fone','+55 11 99203-7376']].forEach(([k,v],i) => {
-      const bg = i%2===0?CINZA_CL:BRANCO;
-      sc(ws,`A${r}`,k,cell(true,bg)); sc(ws,`B${r}`,v,cell(false,bg)); r++;
-    });
-    r++;
-
-    sc(ws, `A${r}`, 'Altenburg — Linha Hotel', hdr(LARANJA, BRANCO, true));
-    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:2} });
-    r++;
-    [['Site','www.altenburg.com.br/linha-hotel'],['Contato','Rui'],['Fone','+55 47 9982-7715']].forEach(([k,v],i) => {
-      const bg = i%2===0?CINZA_CL:BRANCO;
-      sc(ws,`A${r}`,k,cell(true,bg)); sc(ws,`B${r}`,v,cell(false,bg)); r++;
-    });
-
-    ws['!merges'] = merges;
-    ws['!ref'] = `A1:C${r}`;
-    ws['!cols'] = [{wch:20},{wch:42},{wch:20}];
-
-    XLSX.utils.book_append_sheet(wb, ws, 'Fornecedores');
-  })();
-
-  const nome = (data.empreendimento || 'Enxoval_Xtay')
-    .replace(/[^a-zA-Z0-9_\-\u00C0-\u017E ]/g,'').trim().replace(/ /g,'_');
+  
+  const nome = (data.empreendimento || 'Enxoval_Xtay').replace(/[^a-zA-Z0-9_\-\u00C0-\u017E ]/g,'').trim().replace(/ /g,'_');
   XLSX.writeFile(wb, `Enxoval_${nome}.xlsx`);
 }
 
-async function callAPI(userText) {
-  history.push({ role: 'user', content: userText });
-  document.getElementById('sendBtn').disabled = true;
-  showTyping();
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,
-        system: SYSTEM_PROMPT,
-        messages: history
-      })
-    });
-
-    const data = await res.json();
-
-    if (data.error) {
-      removeTyping();
-      addMessage('bot', '⚠️ Erro na API: ' + (data.error.message || 'Tente novamente.'));
-    } else {
-      const reply = data.content?.[0]?.text || 'Não foi possível processar.';
-      history.push({ role: 'assistant', content: reply });
-      removeTyping();
-      const excelData = extractExcelData(reply);
-      addMessage('bot', reply, excelData ? () => gerarExcel(excelData) : null);
-    }
-  } catch(e) {
-    removeTyping();
-    addMessage('bot', '⚠️ Erro de conexão. Verifique sua internet e tente novamente.');
+function processarMensagem(userText) {
+  const { resposta, excel } = processarTexto(userText);
+  
+  if (excel) {
+    addMessage('bot', resposta, () => gerarExcel(excel));
+  } else {
+    addMessage('bot', resposta);
   }
-
-  document.getElementById('sendBtn').disabled = false;
-  document.getElementById('inp').focus();
 }
 
 function sendMessage() {
@@ -633,17 +397,26 @@ function sendMessage() {
   addMessage('user', text);
   inp.value = '';
   inp.style.height = '';
-  callAPI(text);
+  
+  document.getElementById('sendBtn').disabled = true;
+  setTimeout(() => {
+    processarMensagem(text);
+    document.getElementById('sendBtn').disabled = false;
+    document.getElementById('inp').focus();
+  }, 400);
 }
 
 function sendChip(text) {
   hideChips();
   addMessage('user', text);
-  callAPI(text);
+  document.getElementById('sendBtn').disabled = true;
+  setTimeout(() => {
+    processarMensagem(text);
+    document.getElementById('sendBtn').disabled = false;
+  }, 400);
 }
 
-// Boas-vindas
-addMessage('bot', `Olá! 👋 Sou a **Calculadora de Enxoval Xtay**.\n\nPosso te ajudar a dimensionar o enxoval completo do seu empreendimento — quantidade de peças, investimento estimado e geração automática da **planilha Excel** com todos os detalhes.\n\nUse os atalhos abaixo ou descreva o empreendimento para começar!`);
+addMessage('bot', `Olá! 👋 Sou a **Calculadora de Enxoval Xtay**.\n\nPosso te ajudar a dimensionar o enxoval completo do seu empreendimento — quantidade de peças, investimento estimado e geração automática de **planilha Excel** com todos os detalhes.\n\nDescreva o empreendimento ou use os atalhos abaixo!`);
 </script>
 </body>
 </html>
