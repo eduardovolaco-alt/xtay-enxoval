@@ -4,66 +4,64 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Calculadora de Enxoval — Xtay Smart Hotel</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Public+Sans:wght@400;500&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; font-family: 'Public Sans', sans-serif; background: #f0f0f6; color: #191346; }
-    .app { display: flex; flex-direction: column; height: 100vh; max-width: 780px; margin: 0 auto; background: #fff; box-shadow: 0 0 48px rgba(25,19,70,0.10); }
-    .header { background: #191346; padding: 14px 20px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-    .logo { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 24px; color: #F3703A; }
-    .logo-tag { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5); border-left: 1px solid rgba(255,255,255,0.18); padding-left: 14px; }
-    .chat-area { flex: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 14px; background: #f7f7f9; }
-    .msg { display: flex; gap: 10px; align-items: flex-start; max-width: 90%; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Public Sans', sans-serif; background: #f0f0f6; height: 100vh; }
+    .app { display: flex; flex-direction: column; height: 100vh; max-width: 800px; margin: 0 auto; background: white; }
+    .header { background: #191346; padding: 20px; color: white; }
+    .header .logo { font-size: 28px; font-weight: bold; color: #F3703A; }
+    .header .tag { font-size: 12px; opacity: 0.8; }
+    .chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+    .msg { display: flex; gap: 10px; max-width: 85%; }
     .msg.user { align-self: flex-end; flex-direction: row-reverse; }
     .msg.bot { align-self: flex-start; }
-    .msg-avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 12px; }
-    .msg.bot .msg-avatar { background: #F3703A; color: #fff; }
-    .msg.user .msg-avatar { background: #191346; color: #fff; }
-    .msg-bubble { padding: 11px 15px; font-size: 14px; line-height: 1.65; white-space: pre-wrap; word-break: break-word; }
-    .msg.bot .msg-bubble { background: #fff; color: #191346; border: 0.5px solid #e0e0ec; border-radius: 0 16px 16px 16px; }
-    .msg.user .msg-bubble { background: #F3703A; color: #fff; border-radius: 16px 0 16px 16px; }
-    .msg-bubble strong { font-weight: 600; }
-    .dl-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 10px 18px; background: #191346; color: #fff; border: none; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .dl-btn:hover { background: #F3703A; }
-    .chips-bar { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 16px 6px; background: #fff; border-top: 1px solid #ebebf3; }
-    .chip { font-size: 12px; font-weight: 500; color: #191346; background: #f0f0f8; border: 1px solid #dddde8; border-radius: 20px; padding: 6px 13px; cursor: pointer; }
-    .chip:hover { background: #F3703A; color: #fff; }
-    .input-bar { display: flex; gap: 10px; padding: 12px 16px 14px; background: #fff; border-top: 1px solid #ebebf3; align-items: flex-end; }
-    .chat-input { flex: 1; border: 1px solid #dddde8; border-radius: 22px; padding: 10px 16px; font-family: 'Public Sans', sans-serif; font-size: 14px; resize: none; outline: none; min-height: 44px; max-height: 130px; color: #191346; background: #f7f7fb; }
-    .chat-input:focus { border-color: #F3703A; background: #fff; }
-    .send-btn { width: 44px; height: 44px; border-radius: 50%; background: #F3703A; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .send-btn:hover { background: #e05e28; }
-    .send-btn svg { fill: #fff; }
-    .footer { text-align: center; font-size: 11px; color: #aaa; padding: 6px 16px 10px; background: #fff; border-top: 1px solid #f0f0f6; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 12px; flex-shrink: 0; }
+    .msg.bot .avatar { background: #F3703A; }
+    .msg.user .avatar { background: #191346; }
+    .bubble { padding: 12px 16px; border-radius: 12px; line-height: 1.5; word-wrap: break-word; }
+    .msg.bot .bubble { background: #f0f0f8; color: #191346; }
+    .msg.user .bubble { background: #F3703A; color: white; }
+    .bubble strong { font-weight: 600; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 20px; background: white; border-top: 1px solid #eee; }
+    .chip { padding: 8px 14px; background: #f0f0f8; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; font-size: 13px; }
+    .chip:hover { background: #F3703A; color: white; border-color: #F3703A; }
+    .input-area { display: flex; gap: 10px; padding: 12px 20px; background: white; border-top: 1px solid #eee; }
+    input { flex: 1; border: 1px solid #ddd; border-radius: 24px; padding: 10px 16px; font-size: 14px; outline: none; }
+    input:focus { border-color: #F3703A; }
+    button { width: 40px; height: 40px; border-radius: 50%; background: #F3703A; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    button:hover { background: #e05e28; }
+    .btn-excel { display: inline-block; margin-top: 10px; padding: 8px 12px; background: #191346; color: white; border-radius: 6px; cursor: pointer; font-size: 12px; border: none; }
+    .btn-excel:hover { background: #F3703A; }
+    .footer { text-align: center; padding: 10px; font-size: 11px; color: #999; background: white; }
   </style>
 </head>
 <body>
+
 <div class="app">
   <div class="header">
     <div class="logo">xtay</div>
-    <div class="logo-tag">Calculadora de Enxoval<br>Estadias Inteligentes</div>
+    <div class="tag">Calculadora de Enxoval</div>
   </div>
-  <div class="chat-area" id="chat"></div>
-  <div class="chips-bar" id="chipsBar">
-    <span class="chip" onclick="enviarChip('Calcular enxoval: 10 studios')">🛏 Calcular enxoval</span>
-    <span class="chip" onclick="enviarChip('Quais são os fornecedores?')">🏭 Fornecedores</span>
-    <span class="chip" onclick="enviarChip('Qual o padrão dos lençóis?')">📋 Padrão têxtil</span>
-    <span class="chip" onclick="enviarChip('Como funciona o fator de giro?')">🔄 Fator de giro</span>
+
+  <div class="chat" id="chat"></div>
+
+  <div class="chips" id="chips">
+    <div class="chip" onclick="enviar('10 studios')">🛏 10 studios</div>
+    <div class="chip" onclick="enviar('Fornecedores')">🏭 Fornecedores</div>
+    <div class="chip" onclick="enviar('Padrão têxtil')">📋 Padrão</div>
+    <div class="chip" onclick="enviar('Fator de giro')">🔄 Giro</div>
   </div>
-  <div class="input-bar">
-    <textarea class="chat-input" id="inp" placeholder="Ex: 10 studios, 5 aptos 2 dorm..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarMensagem()}"></textarea>
-    <button class="send-btn" onclick="enviarMensagem()">
-      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
-    </button>
+
+  <div class="input-area">
+    <input id="inp" type="text" placeholder="Ex: 10 studios, 5 aptos 2 dorm..." onkeypress="if(event.key==='Enter') enviar(this.value); this.value=''" />
+    <button onclick="var inp=document.getElementById('inp'); enviar(inp.value); inp.value='';">➤</button>
   </div>
-  <div class="footer">Xtay Smart Hotel — v3.1</div>
+
+  <div class="footer">Xtay Smart Hotel v3.2</div>
 </div>
 
 <script>
-const TABELA = {
+const ITENS = {
   'PROTETOR COLCHÃO QUEEN': { preco: 76, giro: 1.2, qtd: 1 },
   'LENÇOL QUEEN': { preco: 60, giro: 3, qtd: 2 },
   'EDREDON QUEEN': { preco: 180, giro: 1.2, qtd: 1 },
@@ -85,219 +83,171 @@ const TABELA = {
   'TOALHA PISO': { preco: 17, giro: 3, qtd: 0 }
 };
 
-function addMessage(role, text, excel) {
+function addMsg(role, text, excel) {
   const chat = document.getElementById('chat');
-  const wrap = document.createElement('div');
-  wrap.className = 'msg ' + role;
+  const msg = document.createElement('div');
+  msg.className = 'msg ' + role;
   
   const avatar = document.createElement('div');
-  avatar.className = 'msg-avatar';
+  avatar.className = 'avatar';
   avatar.textContent = role === 'bot' ? 'X' : 'VC';
   
   const bubble = document.createElement('div');
-  bubble.className = 'msg-bubble';
-  bubble.innerHTML = text
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\n/g,'<br>');
+  bubble.className = 'bubble';
+  bubble.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   
   if (excel) {
-    const br = document.createElement('br');
     const btn = document.createElement('button');
-    btn.className = 'dl-btn';
-    btn.innerHTML = '📊 Baixar Planilha Excel';
+    btn.className = 'btn-excel';
+    btn.textContent = '📊 Baixar Excel';
     btn.onclick = () => gerarExcel(excel);
-    bubble.appendChild(br);
+    bubble.appendChild(document.createElement('br'));
     bubble.appendChild(btn);
   }
   
-  wrap.appendChild(avatar);
-  wrap.appendChild(bubble);
-  chat.appendChild(wrap);
+  msg.appendChild(avatar);
+  msg.appendChild(bubble);
+  chat.appendChild(msg);
   chat.scrollTop = chat.scrollHeight;
 }
 
-function calcular(text) {
-  text = text.toLowerCase();
+function processar(texto) {
+  texto = texto.toLowerCase().trim();
   
-  if (text.includes('fornecedor')) {
-    return { msg: '**Fornecedores Oficiais:**\n\n1. **Maxlink Têxtil**\n   +55 11 99203-7376\n\n2. **Altenburg Linha Hotel**\n   +55 47 9982-7715', excel: null };
+  if (!texto) return;
+  
+  if (texto.includes('fornecedor')) {
+    return { msg: '**Fornecedores Oficiais Xtay:**\n\n1. **Maxlink Têxtil**\n   Ernesto: +55 11 99203-7376\n\n2. **Altenburg Linha Hotel**\n   Rui: +55 47 9982-7715', excel: null };
   }
   
-  if (text.includes('padrão') || text.includes('lençol')) {
-    return { msg: '**Padrão Têxtil:**\n\n2 lençóis/fronhas por cama (giro 3x)\n1 edredon por cama (giro 1.2x)\n1-2 travesseiros/protetores por cama (giro 1.2x)', excel: null };
+  if (texto.includes('padrão')) {
+    return { msg: '**Padrão Têxtil Xtay:**\n\n• 2 lençóis por cama (giro 3x)\n• 1 edredon por cama (giro 1.2x)\n• 2 travesseiros por cama (giro 1.2x)\n• 2 fronhas por cama (giro 3x)', excel: null };
   }
   
-  if (text.includes('giro')) {
-    return { msg: '**Fator de Giro:**\n\nGiro 3x = Rotação rápida (lençóis, toalhas)\nGiro 1.2x = Rotação lenta (edredons, protetores)', excel: null };
+  if (texto.includes('giro')) {
+    return { msg: '**Fator de Giro:**\n\n• Giro 3x = Itens com rotação rápida (lençóis, fronhas, toalhas)\n• Giro 1.2x = Itens com rotação lenta (edredons, cobertores, protetores)', excel: null };
   }
   
-  // Procurar padrão: número + studio/dorm
+  // Parseador de tipologias
   const regex = /(\d+)\s*(studio|studios|1\s*dorm|2\s*dorm|3\s*dorm)/gi;
-  const matches = [...text.matchAll(regex)];
+  const matches = [...texto.matchAll(regex)];
   
   if (matches.length === 0) {
-    return { msg: 'Descreva o empreendimento:\n"10 studios" ou "5 aptos 2 dorm, 3 aptos 3 dorm"', excel: null };
+    return { msg: 'Por favor, descreva o empreendimento:\n"10 studios" ou "5 aptos 2 dorm, 3 aptos 3 dorm"', excel: null };
   }
   
-  let tipologias = [];
   let totalPecas = 0;
   let totalInvest = 0;
   let resumo = {};
+  let detalhes = [];
   
-  matches.forEach(m => {
-    const qtd = parseInt(m[1]);
-    const tipo = m[2].toLowerCase();
+  matches.forEach(match => {
+    const qtd = parseInt(match[1]);
+    const tipo = match[2].toLowerCase();
     
-    let config;
+    let config = {};
     if (tipo.includes('studio')) {
       config = { nome: 'STUDIO', queens: 1, solteiros: 0, banheiros: 1 };
-    } else if (tipo.includes('1')) {
-      config = { nome: '1 DORM', queens: 1, solteiros: 0, banheiros: 1 };
-    } else if (tipo.includes('2')) {
-      config = { nome: '2 DORM', queens: 1, solteiros: 1, banheiros: 2 };
+    } else if (tipo === '1 dorm' || tipo === '1dorm') {
+      config = { nome: '1 DORMITÓRIO', queens: 1, solteiros: 0, banheiros: 1 };
+    } else if (tipo === '2 dorm' || tipo === '2dorm') {
+      config = { nome: '2 DORMITÓRIOS', queens: 1, solteiros: 1, banheiros: 2 };
     } else {
-      config = { nome: '3 DORM', queens: 1, solteiros: 2, banheiros: 2 };
+      config = { nome: '3 DORMITÓRIOS', queens: 1, solteiros: 2, banheiros: 2 };
     }
     
-    let itens = [];
     let subtotal = 0;
     
     // Queens
     ['PROTETOR COLCHÃO QUEEN', 'LENÇOL QUEEN', 'EDREDON QUEEN', 'CAPA EDREDON QUEEN', 'COBERTOR QUEEN', 'TRAVESSEIRO QUEEN', 'PROTETOR TRAVESSEIRO QUEEN', 'FRONHA QUEEN'].forEach(item => {
-      const info = TABELA[item];
-      const n = Math.ceil(info.qtd * qtd * info.giro);
+      const info = ITENS[item];
+      const n = Math.ceil(info.qtd * config.queens * qtd * info.giro);
       const t = n * info.preco;
-      itens.push({ nome: item, qtd: n, preco: info.preco, total: t });
       resumo[item] = (resumo[item] || 0) + n;
       totalPecas += n;
       subtotal += t;
     });
     
     // Solteiros
-    ['PROTETOR COLCHÃO SOLTEIRO', 'LENÇOL SOLTEIRO', 'EDREDON SOLTEIRO', 'CAPA EDREDON SOLTEIRO', 'COBERTOR SOLTEIRO', 'TRAVESSEIRO SOLTEIRO', 'PROTETOR TRAVESSEIRO SOLTEIRO', 'FRONHA SOLTEIRO'].forEach(item => {
-      for (let i = 0; i < config.solteiros; i++) {
-        const info = TABELA[item];
+    for (let s = 0; s < config.solteiros; s++) {
+      ['PROTETOR COLCHÃO SOLTEIRO', 'LENÇOL SOLTEIRO', 'EDREDON SOLTEIRO', 'CAPA EDREDON SOLTEIRO', 'COBERTOR SOLTEIRO', 'TRAVESSEIRO SOLTEIRO', 'PROTETOR TRAVESSEIRO SOLTEIRO', 'FRONHA SOLTEIRO'].forEach(item => {
+        const info = ITENS[item];
         const n = Math.ceil(info.qtd * qtd * info.giro);
         const t = n * info.preco;
-        itens.push({ nome: item, qtd: n, preco: info.preco, total: t });
         resumo[item] = (resumo[item] || 0) + n;
         totalPecas += n;
         subtotal += t;
-      }
-    });
+      });
+    }
     
     // Toalhas
     const pessoas = (config.queens * 2) + (config.solteiros * 1);
     ['TOALHA BANHO', 'TOALHA ROSTO'].forEach(item => {
-      const info = TABELA[item];
+      const info = ITENS[item];
       const n = Math.ceil(pessoas * qtd * info.giro);
       const t = n * info.preco;
-      itens.push({ nome: item, qtd: n, preco: info.preco, total: t });
       resumo[item] = (resumo[item] || 0) + n;
       totalPecas += n;
       subtotal += t;
     });
     
-    const toalhaPiso = TABELA['TOALHA PISO'];
-    const nPiso = Math.ceil(config.banheiros * qtd * toalhaPiso.giro);
-    const tPiso = nPiso * toalhaPiso.preco;
-    itens.push({ nome: 'TOALHA PISO', qtd: nPiso, preco: toalhaPiso.preco, total: tPiso });
-    resumo['TOALHA PISO'] = (resumo['TOALHA PISO'] || 0) + nPiso;
-    totalPecas += nPiso;
-    subtotal += tPiso;
-    
-    tipologias.push({
-      nome: config.nome,
-      qtd: qtd,
-      itens: itens,
-      subtotal: subtotal
-    });
+    const pi = ITENS['TOALHA PISO'];
+    const np = Math.ceil(config.banheiros * qtd * pi.giro);
+    const tp = np * pi.preco;
+    resumo['TOALHA PISO'] = (resumo['TOALHA PISO'] || 0) + np;
+    totalPecas += np;
+    subtotal += tp;
     
     totalInvest += subtotal;
+    detalhes.push(`**${config.nome}:** ${qtd} aptos → R$ ${subtotal.toLocaleString('pt-BR')}`);
   });
   
-  const resumoArr = Object.entries(resumo).map(([item, qtd]) => ({
-    item,
-    qtd,
-    preco: TABELA[item].preco,
-    total: qtd * TABELA[item].preco
-  }));
+  const msg = `**Cálculo Enxoval Xtay**\n\n${detalhes.join('\n')}\n\n**TOTAIS:**\n• Peças: ${totalPecas}\n• Investimento: R$ ${totalInvest.toLocaleString('pt-BR')}\n\n**Fornecedores:** Maxlink (+55 11 99203-7376) | Altenburg (+55 47 9982-7715)`;
   
   const excelData = {
-    tipologias,
-    resumo: resumoArr,
+    resumo: Object.entries(resumo).map(([item, qtd]) => ({
+      item,
+      qtd,
+      preco: ITENS[item].preco,
+      total: qtd * ITENS[item].preco
+    })),
     totalPecas,
     totalInvest
   };
   
-  const msg = `**Cálculo Enxoval Xtay**\n\n${tipologias.map(t => `${t.nome}: ${t.qtd} aptos | R$ ${t.subtotal.toLocaleString('pt-BR')}`).join('\n')}\n\n**Total:** ${totalPecas} peças | R$ ${totalInvest.toLocaleString('pt-BR')}`;
-  
   return { msg, excel: excelData };
 }
 
+function enviar(texto) {
+  if (!texto.trim()) return;
+  
+  document.getElementById('chips').style.display = 'none';
+  addMsg('user', texto);
+  
+  const { msg, excel } = processar(texto);
+  setTimeout(() => {
+    addMsg('bot', msg, excel);
+  }, 200);
+}
+
 function gerarExcel(data) {
-  const wb = XLSX.utils.book_new();
-  
-  // Resumo
-  const ws = {};
-  let r = 1;
-  ws['A' + r] = { v: 'ENXOVAL XTAY', t: 's' };
-  r += 2;
-  
-  ws['A' + r] = { v: 'ITEM', t: 's' };
-  ws['B' + r] = { v: 'QTD', t: 's' };
-  ws['C' + r] = { v: 'PREÇO', t: 's' };
-  ws['D' + r] = { v: 'TOTAL', t: 's' };
-  r++;
-  
+  let csv = 'ENXOVAL XTAY\n\nITEM,QTD,PREÇO,TOTAL\n';
   data.resumo.forEach(item => {
-    ws['A' + r] = { v: item.item, t: 's' };
-    ws['B' + r] = { v: item.qtd, t: 'n' };
-    ws['C' + r] = { v: item.preco, t: 'n' };
-    ws['D' + r] = { v: item.total, t: 'n' };
-    r++;
+    csv += `"${item.item}",${item.qtd},${item.preco},${item.total}\n`;
   });
+  csv += `\nTOTAL PEÇAS,${data.totalPecas}\nTOTAL INVESTIMENTO,R$ ${data.totalInvest.toLocaleString('pt-BR')}\n`;
   
-  r++;
-  ws['A' + r] = { v: 'TOTAL PEÇAS', t: 's' };
-  ws['D' + r] = { v: data.totalPecas, t: 'n' };
-  r++;
-  
-  ws['A' + r] = { v: 'TOTAL INVESTIMENTO', t: 's' };
-  ws['D' + r] = { v: data.totalInvest, t: 'n' };
-  
-  ws['!ref'] = 'A1:D' + r;
-  ws['!cols'] = [{ wch: 35 }, { wch: 12 }, { wch: 12 }, { wch: 15 }];
-  
-  XLSX.utils.book_append_sheet(wb, ws, 'Resumo');
-  XLSX.writeFile(wb, 'Enxoval_Xtay.xlsx');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Enxoval_Xtay.csv';
+  a.click();
 }
 
-function enviarMensagem() {
-  const inp = document.getElementById('inp');
-  const text = inp.value.trim();
-  if (!text) return;
-  
-  addMessage('user', text);
-  inp.value = '';
-  
-  const { msg, excel } = calcular(text);
-  setTimeout(() => {
-    addMessage('bot', msg, excel);
-  }, 300);
-}
-
-function enviarChip(text) {
-  document.getElementById('chipsBar').style.display = 'none';
-  addMessage('user', text);
-  const { msg, excel } = calcular(text);
-  setTimeout(() => {
-    addMessage('bot', msg, excel);
-  }, 300);
-}
-
-addMessage('bot', '👋 Olá! Sou a **Calculadora de Enxoval Xtay**.\n\nDescreva seu empreendimento:\n"10 studios" ou "5 aptos 2 dorm"');
+// Mensagem de boas-vindas
+addMsg('bot', '👋 Olá! Sou a **Calculadora de Enxoval Xtay**.\n\nDescreva seu empreendimento:\n"10 studios" ou "5 aptos 2 dorm, 3 aptos 3 dorm"');
 </script>
+
 </body>
 </html>
