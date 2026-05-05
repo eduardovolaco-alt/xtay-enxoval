@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Public+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -70,21 +71,17 @@
       max-width: 90%;
     }
     .msg.user { align-self: flex-end; flex-direction: row-reverse; }
-    .msg.bot { align-self: flex-start; }
+    .msg.bot  { align-self: flex-start; }
 
     .msg-avatar {
-      width: 34px; 
-      height: 34px;
+      width: 34px; height: 34px;
       border-radius: 50%;
       flex-shrink: 0;
-      display: flex; 
-      align-items: center; 
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       font-family: 'Poppins', sans-serif;
-      font-weight: 700; 
-      font-size: 12px;
+      font-weight: 700; font-size: 12px;
     }
-    .msg.bot .msg-avatar { background: #F3703A; color: #fff; }
+    .msg.bot  .msg-avatar { background: #F3703A; color: #fff; }
     .msg.user .msg-avatar { background: #191346; color: #fff; }
 
     .msg-bubble {
@@ -111,7 +108,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 14px;
       padding: 10px 18px;
       background: #191346;
       color: #fff;
@@ -123,35 +120,42 @@
       cursor: pointer;
       transition: background 0.15s, transform 0.1s;
     }
-    .dl-btn:hover { background: #F3703A; }
+    .dl-btn:hover  { background: #F3703A; }
     .dl-btn:active { transform: scale(0.97); }
+    .dl-btn svg { fill: #fff; flex-shrink: 0; }
+
+    .typing-dots { display: flex; align-items: center; gap: 4px; padding: 4px 0; }
+    .typing-dots span {
+      display: inline-block; width: 7px; height: 7px;
+      border-radius: 50%; background: #F3703A;
+      animation: tdot 1.2s infinite ease-in-out;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes tdot {
+      0%,60%,100% { transform: translateY(0); opacity:.5; }
+      30% { transform: translateY(-7px); opacity:1; }
+    }
 
     .chips-bar {
-      display: flex; 
-      flex-wrap: wrap; 
-      gap: 8px;
+      display: flex; flex-wrap: wrap; gap: 8px;
       padding: 10px 16px 6px;
       background: #fff;
       border-top: 1px solid #ebebf3;
     }
     .chip {
       font-family: 'Public Sans', sans-serif;
-      font-size: 12px; 
-      font-weight: 500;
-      color: #191346; 
-      background: #f0f0f8;
-      border: 1px solid #dddde8; 
-      border-radius: 20px;
-      padding: 6px 13px; 
-      cursor: pointer;
+      font-size: 12px; font-weight: 500;
+      color: #191346; background: #f0f0f8;
+      border: 1px solid #dddde8; border-radius: 20px;
+      padding: 6px 13px; cursor: pointer;
       transition: background .15s, border-color .15s, color .15s;
       white-space: nowrap;
     }
     .chip:hover { background: #F3703A; color: #fff; border-color: #F3703A; }
 
     .input-bar {
-      display: flex; 
-      gap: 10px;
+      display: flex; gap: 10px;
       padding: 12px 16px 14px;
       background: #fff;
       border-top: 1px solid #ebebf3;
@@ -160,49 +164,33 @@
     }
     .chat-input {
       flex: 1;
-      border: 1px solid #dddde8; 
-      border-radius: 22px;
+      border: 1px solid #dddde8; border-radius: 22px;
       padding: 10px 16px;
-      font-family: 'Public Sans', sans-serif; 
-      font-size: 14px; 
-      line-height: 1.5;
-      resize: none; 
-      outline: none;
-      min-height: 44px; 
-      max-height: 130px; 
-      overflow-y: auto;
-      color: #191346; 
-      background: #f7f7fb;
+      font-family: 'Public Sans', sans-serif; font-size: 14px; line-height: 1.5;
+      resize: none; outline: none;
+      min-height: 44px; max-height: 130px; overflow-y: auto;
+      color: #191346; background: #f7f7fb;
       transition: border-color .15s, background .15s;
     }
     .chat-input::placeholder { color: #aaa; }
     .chat-input:focus { border-color: #F3703A; background: #fff; }
 
     .send-btn {
-      width: 44px; 
-      height: 44px; 
-      border-radius: 50%;
-      background: #F3703A; 
-      border: none; 
-      cursor: pointer;
-      display: flex; 
-      align-items: center; 
-      justify-content: center;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #F3703A; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
       transition: background .15s, transform .1s;
     }
-    .send-btn:hover { background: #e05e28; }
+    .send-btn:hover  { background: #e05e28; }
     .send-btn:active { transform: scale(.94); }
     .send-btn:disabled { background: #ccc; cursor: not-allowed; }
     .send-btn svg { fill: #fff; display: block; }
 
     .footer {
-      text-align: center; 
-      font-size: 11px; 
-      color: #aaa;
+      text-align: center; font-size: 11px; color: #aaa;
       padding: 6px 16px 10px;
-      background: #fff; 
-      border-top: 1px solid #f0f0f6;
+      background: #fff; border-top: 1px solid #f0f0f6;
       flex-shrink: 0;
     }
 
@@ -227,9 +215,9 @@
   <div class="chat-area" id="chat"></div>
 
   <div class="chips-bar" id="chipsBar">
-    <span class="chip" onclick="sendChip('Calcular enxoval: 10 studios')">🛏 Calcular enxoval</span>
-    <span class="chip" onclick="sendChip('Quais são os fornecedores?')">🏭 Fornecedores</span>
-    <span class="chip" onclick="sendChip('Qual o padrão têxtil?')">📋 Padrão têxtil</span>
+    <span class="chip" onclick="sendChip('Quero calcular o enxoval de um novo empreendimento')">🛏 Calcular enxoval</span>
+    <span class="chip" onclick="sendChip('Quais são os fornecedores oficiais Xtay?')">🏭 Fornecedores</span>
+    <span class="chip" onclick="sendChip('Qual o padrão dos lençóis Xtay?')">📋 Padrão têxtil</span>
     <span class="chip" onclick="sendChip('Como funciona o fator de giro?')">🔄 Fator de giro</span>
   </div>
 
@@ -244,32 +232,89 @@
     </button>
   </div>
 
-  <div class="footer">Xtay Smart Hotel &mdash; Uso interno &mdash; v3.2</div>
+  <div class="footer">Xtay Smart Hotel &mdash; Uso interno &mdash; v2.0</div>
 </div>
 
 <script>
-const ITENS = {
-  'PROTETOR COLCHÃO QUEEN': { preco: 76, giro: 1.2, qtd: 1 },
-  'LENÇOL QUEEN': { preco: 60, giro: 3, qtd: 2 },
-  'EDREDON QUEEN': { preco: 180, giro: 1.2, qtd: 1 },
-  'CAPA EDREDON QUEEN': { preco: 130, giro: 3, qtd: 1 },
-  'COBERTOR QUEEN': { preco: 130, giro: 1.2, qtd: 1 },
-  'TRAVESSEIRO QUEEN': { preco: 75, giro: 1.2, qtd: 2 },
-  'PROTETOR TRAVESSEIRO QUEEN': { preco: 13, giro: 1.2, qtd: 2 },
-  'FRONHA QUEEN': { preco: 12, giro: 3, qtd: 2 },
-  'PROTETOR COLCHÃO SOLTEIRO': { preco: 76, giro: 1.2, qtd: 1 },
-  'LENÇOL SOLTEIRO': { preco: 60, giro: 3, qtd: 2 },
-  'EDREDON SOLTEIRO': { preco: 180, giro: 1.2, qtd: 1 },
-  'CAPA EDREDON SOLTEIRO': { preco: 130, giro: 3, qtd: 1 },
-  'COBERTOR SOLTEIRO': { preco: 130, giro: 1.2, qtd: 1 },
-  'TRAVESSEIRO SOLTEIRO': { preco: 75, giro: 1.2, qtd: 1 },
-  'PROTETOR TRAVESSEIRO SOLTEIRO': { preco: 13, giro: 1.2, qtd: 1 },
-  'FRONHA SOLTEIRO': { preco: 12, giro: 3, qtd: 1 },
-  'TOALHA BANHO': { preco: 56, giro: 3, qtd: 0 },
-  'TOALHA ROSTO': { preco: 18, giro: 3, qtd: 0 },
-  'TOALHA PISO': { preco: 17, giro: 3, qtd: 0 }
-};
+const SYSTEM_PROMPT = `Você é a Calculadora de Enxoval da Xtay Smart Hotel. Ajude colaboradores a dimensionar o enxoval de empreendimentos com precisão.
 
+TABELA DE ITENS:
+Item | R$ Unit | Giro | Qtd por unidade
+PROTETOR COLCHÃO QUEEN | 76 | 1.2 | 1 por cama queen
+LENÇOL QUEEN | 60 | 3 | 2 por cama queen
+EDREDON QUEEN | 180 | 1.2 | 1 por cama queen
+CAPA EDREDON QUEEN | 130 | 3 | 1 por cama queen
+COBERTOR QUEEN | 130 | 1.2 | 1 por cama queen
+TRAVESSEIRO QUEEN | 75 | 1.2 | 2 por cama queen
+PROTETOR TRAVESSEIRO QUEEN | 13 | 1.2 | 2 por cama queen
+FRONHA QUEEN | 12 | 3 | 2 por cama queen
+PROTETOR COLCHÃO SOLTEIRO | 76 | 1.2 | 1 por cama solteiro
+LENÇOL SOLTEIRO | 60 | 3 | 2 por cama solteiro
+EDREDON SOLTEIRO | 180 | 1.2 | 1 por cama solteiro
+CAPA EDREDON SOLTEIRO | 130 | 3 | 1 por cama solteiro
+COBERTOR SOLTEIRO | 130 | 1.2 | 1 por cama solteiro
+TRAVESSEIRO SOLTEIRO | 75 | 1.2 | 1 por cama solteiro
+PROTETOR TRAVESSEIRO SOLTEIRO | 13 | 1.2 | 1 por cama solteiro
+FRONHA SOLTEIRO | 12 | 3 | 1 por cama solteiro
+LENÇOL SOFÁ CAMA | 60 | 3 | 2 por sofá-cama
+COBERTOR SOFÁ CAMA | 130 | 1.2 | 1 por sofá-cama
+TRAVESSEIRO SOFÁ CAMA | 75 | 1.2 | 1 por sofá-cama
+PROTETOR TRAVESSEIRO SOFÁ CAMA | 13 | 1.2 | 1 por sofá-cama
+TOALHA BANHO | 56 | 3 | máx pessoas por apto
+TOALHA ROSTO | 18 | 3 | máx pessoas por apto
+TOALHA PISO | 17 | 3 | qtd banheiros por apto
+
+FÓRMULA: Qtd Total = Qtd_por_unidade × Qtd_unidades_no_apto × Num_aptos × Fator_giro
+
+REGRA TOALHAS:
+- Banho e Rosto = máximo de pessoas por apto (Queen=2, Solteiro=1, Sofá=2 — soma dos máximos)
+- Piso = número de banheiros
+
+TIPOLOGIAS TÍPICAS:
+- Studio: 1 Queen, 1 banheiro
+- 1 Dorm: 1 Queen, 1 banheiro (pode ter sofá-cama)
+- 2 Dorm: 1 Queen + 1 Solteiro ou 2 Solteiros, 1-2 banheiros
+- 3 Dorm: 1 Queen + 2 Solteiros, 2 banheiros
+
+FORNECEDORES OFICIAIS:
+1. Maxlink Têxtil — maxlink.com.br — Ernesto: +55 11 99203-7376
+2. Altenburg Linha Hotel — altenburg.com.br/linha-hotel — Rui: +55 47 9982-7715
+
+INSTRUÇÕES CRÍTICAS:
+1. Quando fizer um cálculo de enxoval completo, inclua OBRIGATORIAMENTE ao final da resposta um bloco JSON entre as tags ===EXCEL_DATA_START=== e ===EXCEL_DATA_END===
+2. O bloco JSON deve seguir EXATAMENTE este formato:
+
+===EXCEL_DATA_START===
+{
+  "empreendimento": "nome ou descrição do empreendimento",
+  "data": "DD/MM/AAAA",
+  "tipologias": [
+    {
+      "nome": "STUDIO",
+      "aptos": 10,
+      "banheiros": 1,
+      "queen": 1,
+      "solteiro": 0,
+      "sofa": 0,
+      "itens": [
+        { "item": "PROTETOR COLCHÃO QUEEN", "qtd": 12, "unitario": 76, "total": 912 }
+      ],
+      "subtotal": 912
+    }
+  ],
+  "resumo": [
+    { "item": "PROTETOR COLCHÃO QUEEN", "qtd_total": 12, "unitario": 76, "total": 912 }
+  ],
+  "total_pecas": 100,
+  "total_investimento": 15000
+}
+===EXCEL_DATA_END===
+
+3. Responda SEMPRE em português do Brasil
+4. Exiba o cálculo em texto legível ANTES do bloco JSON
+5. Ao final de qualquer cálculo, mencione os fornecedores`;
+
+let history = [];
 let chipsHidden = false;
 
 function addMessage(role, text, withExcel) {
@@ -284,7 +329,9 @@ function addMessage(role, text, withExcel) {
   const bubble = document.createElement('div');
   bubble.className = 'msg-bubble';
 
-  bubble.innerHTML = text
+  const cleanText = text.replace(/===EXCEL_DATA_START===[\s\S]*?===EXCEL_DATA_END===/g, '').trim();
+
+  bubble.innerHTML = cleanText
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
     .replace(/\n/g,'<br>');
@@ -293,7 +340,7 @@ function addMessage(role, text, withExcel) {
     const br = document.createElement('br');
     const btn = document.createElement('button');
     btn.className = 'dl-btn';
-    btn.innerHTML = `📊 Baixar Planilha Excel`;
+    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 8h14v2H5v-2z"/></svg> Baixar Planilha Excel`;
     btn.onclick = withExcel;
     bubble.appendChild(br);
     bubble.appendChild(btn);
@@ -303,6 +350,21 @@ function addMessage(role, text, withExcel) {
   wrap.appendChild(bubble);
   chat.appendChild(wrap);
   chat.scrollTop = chat.scrollHeight;
+}
+
+function showTyping() {
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg bot';
+  wrap.id = 'typing-indicator';
+  wrap.innerHTML = `<div class="msg-avatar" style="background:#F3703A;color:#fff;font-family:'Poppins',sans-serif;font-weight:700;font-size:12px;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;">X</div><div class="msg-bubble" style="background:#fff;border:0.5px solid #e0e0ec;border-radius:0 16px 16px 16px;padding:11px 15px;"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
 }
 
 function hideChips() {
@@ -321,175 +383,554 @@ function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
-function processar(texto) {
-  texto = texto.toLowerCase();
-
-  if (texto.includes('fornecedor')) {
-    return { 
-      msg: '**Fornecedores Oficiais Xtay:**\n\n1. **Maxlink Têxtil**\n   www.maxlink.com.br\n   Contato: Ernesto\n   +55 11 99203-7376\n\n2. **Altenburg Linha Hotel**\n   www.altenburg.com.br/linha-hotel\n   Contato: Rui\n   +55 47 9982-7715',
-      excel: null 
-    };
-  }
-
-  if (texto.includes('padrão')) {
-    return { 
-      msg: '**Padrão Têxtil Xtay:**\n\n• **2 Lençóis** por cama (rotação 3x)\n• **1 Edredon** por cama (rotação 1.2x)\n• **1 Capa de Edredon** por cama (rotação 3x)\n• **1 Cobertor** por cama (rotação 1.2x)\n• **Travesseiros:** 2 por queen, 1 por solteiro (rotação 1.2x)\n• **Fronhas:** 2 por cama (rotação 3x)',
-      excel: null 
-    };
-  }
-
-  if (texto.includes('giro')) {
-    return { 
-      msg: '**Fator de Giro Xtay:**\n\n**Giro 3x** = Itens com rotação rápida\n   └ Lençóis, Fronhas, Toalhas\n   └ Substituição frequente\n\n**Giro 1.2x** = Itens com rotação lenta\n   └ Edredons, Cobertores, Protetores\n   └ Maior durabilidade',
-      excel: null 
-    };
-  }
-
-  // Parse tipologias
-  const regex = /(\d+)\s*(studio|studios|1\s*dorm|2\s*dorm|3\s*dorm)/gi;
-  const matches = [...texto.matchAll(regex)];
-
-  if (matches.length === 0) {
-    return { 
-      msg: '**Por favor, descreva seu empreendimento:**\n\nExemplos:\n"10 studios"\n"5 aptos 2 dorm"\n"3 studios, 5 aptos 2 dorm, 2 aptos 3 dorm"',
-      excel: null 
-    };
-  }
-
-  let tipologias = [];
-  let totalPecas = 0;
-  let totalInvest = 0;
-  let resumo = {};
-
-  matches.forEach(m => {
-    const qtd = parseInt(m[1]);
-    const tipo = m[2].toLowerCase();
-
-    let config;
-    if (tipo.includes('studio')) {
-      config = { nome: 'STUDIO', queens: 1, solteiros: 0, banheiros: 1 };
-    } else if (tipo === '1 dorm' || tipo === '1dorm') {
-      config = { nome: '1 DORMITÓRIO', queens: 1, solteiros: 0, banheiros: 1 };
-    } else if (tipo === '2 dorm' || tipo === '2dorm') {
-      config = { nome: '2 DORMITÓRIOS', queens: 1, solteiros: 1, banheiros: 2 };
-    } else {
-      config = { nome: '3 DORMITÓRIOS', queens: 1, solteiros: 2, banheiros: 2 };
-    }
-
-    let subtotal = 0;
-    let tipoItens = [];
-
-    // Queens
-    ['PROTETOR COLCHÃO QUEEN', 'LENÇOL QUEEN', 'EDREDON QUEEN', 'CAPA EDREDON QUEEN', 'COBERTOR QUEEN', 'TRAVESSEIRO QUEEN', 'PROTETOR TRAVESSEIRO QUEEN', 'FRONHA QUEEN'].forEach(item => {
-      const info = ITENS[item];
-      const n = Math.ceil(info.qtd * config.queens * qtd * info.giro);
-      const t = n * info.preco;
-      tipoItens.push({ item, qtd: n, preco: info.preco, total: t });
-      resumo[item] = (resumo[item] || 0) + n;
-      totalPecas += n;
-      subtotal += t;
-    });
-
-    // Solteiros
-    for (let s = 0; s < config.solteiros; s++) {
-      ['PROTETOR COLCHÃO SOLTEIRO', 'LENÇOL SOLTEIRO', 'EDREDON SOLTEIRO', 'CAPA EDREDON SOLTEIRO', 'COBERTOR SOLTEIRO', 'TRAVESSEIRO SOLTEIRO', 'PROTETOR TRAVESSEIRO SOLTEIRO', 'FRONHA SOLTEIRO'].forEach(item => {
-        const info = ITENS[item];
-        const n = Math.ceil(info.qtd * qtd * info.giro);
-        const t = n * info.preco;
-        tipoItens.push({ item, qtd: n, preco: info.preco, total: t });
-        resumo[item] = (resumo[item] || 0) + n;
-        totalPecas += n;
-        subtotal += t;
-      });
-    }
-
-    // Toalhas
-    const pessoas = (config.queens * 2) + (config.solteiros * 1);
-    ['TOALHA BANHO', 'TOALHA ROSTO'].forEach(item => {
-      const info = ITENS[item];
-      const n = Math.ceil(pessoas * qtd * info.giro);
-      const t = n * info.preco;
-      tipoItens.push({ item, qtd: n, preco: info.preco, total: t });
-      resumo[item] = (resumo[item] || 0) + n;
-      totalPecas += n;
-      subtotal += t;
-    });
-
-    const pi = ITENS['TOALHA PISO'];
-    const np = Math.ceil(config.banheiros * qtd * pi.giro);
-    const tp = np * pi.preco;
-    tipoItens.push({ item: 'TOALHA PISO', qtd: np, preco: pi.preco, total: tp });
-    resumo['TOALHA PISO'] = (resumo['TOALHA PISO'] || 0) + np;
-    totalPecas += np;
-    subtotal += tp;
-
-    tipologias.push({
-      nome: config.nome,
-      qtd: qtd,
-      itens: tipoItens,
-      subtotal: subtotal
-    });
-
-    totalInvest += subtotal;
-  });
-
-  const resumoArray = Object.entries(resumo).map(([item, qtd]) => ({
-    item,
-    qtd,
-    preco: ITENS[item].preco,
-    total: qtd * ITENS[item].preco
-  }));
-
-  const excelData = { tipologias, resumo: resumoArray, totalPecas, totalInvest };
-
-  const detalhes = tipologias.map(t => `**${t.nome}:** ${t.qtd} aptos | R$ ${t.subtotal.toLocaleString('pt-BR')}`).join('\n');
-  const msg = `**Cálculo Enxoval Xtay**\n\n${detalhes}\n\n**Total:** ${totalPecas} peças | R$ ${totalInvest.toLocaleString('pt-BR')}\n\n**Fornecedores:** Maxlink (+55 11 99203-7376) | Altenburg (+55 47 9982-7715)`;
-
-  return { msg, excel: excelData };
+function extractExcelData(text) {
+  const match = text.match(/===EXCEL_DATA_START===([\s\S]*?)===EXCEL_DATA_END===/);
+  if (!match) return null;
+  try { return JSON.parse(match[1].trim()); }
+  catch(e) { console.warn('JSON parse error:', e); return null; }
 }
 
 function gerarExcel(data) {
   const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet([
-    ['RESUMO GERAL — ENXOVAL XTAY'],
-    [],
-    ['ITEM', 'QTD TOTAL', 'R$ UNITÁRIO', 'R$ TOTAL']
-  ]);
 
-  let r = 4;
-  data.resumo.forEach(item => {
-    XLSX.utils.sheet_add_aoa(ws, [[item.item, item.qtd, item.preco, item.total]], { origin: `A${r}` });
-    r++;
+  // ── CORES ──
+  const C_LARANJA = 'FFF3703A';
+  const C_AZUL    = 'FF191346';
+  const C_BRANCO  = 'FFFFFFFF';
+  const C_CINZA   = 'FFF5F5F8';
+  const C_AMARELO = 'FFFFF2CC'; // células editáveis (laranja claro)
+  const C_AZUL_CL = 'FFD6E4F7'; // células calculadas
+
+  const BD = { style:'thin', color:{ rgb:'FFD0D0D0' } };
+  const BORDA = { top:BD, bottom:BD, left:BD, right:BD };
+  const BD_MED = { style:'medium', color:{ rgb:'FF191346' } };
+  const BORDA_MED = { top:BD_MED, bottom:BD_MED, left:BD_MED, right:BD_MED };
+
+  function sc(ws, addr, v, s, fmt) {
+    ws[addr] = { v, t: typeof v === 'number' ? 'n' : 's' };
+    if (s) ws[addr].s = s;
+    if (fmt) ws[addr].z = fmt;
+  }
+
+  // ── ESTILOS BASE ──
+  const sHdr = (bg, fg) => ({
+    font: { name:'Arial', sz:11, bold:true, color:{ rgb: fg||C_BRANCO } },
+    fill: { fgColor:{ rgb: bg||C_AZUL } },
+    alignment: { horizontal:'center', vertical:'center', wrapText:true },
+    border: BORDA
   });
 
-  r++;
-  XLSX.utils.sheet_add_aoa(ws, [['TOTAL DE PEÇAS', data.totalPecas, '', '']], { origin: `A${r}` });
-  r++;
-  XLSX.utils.sheet_add_aoa(ws, [['INVESTIMENTO TOTAL', '', '', `R$ ${data.totalInvest.toLocaleString('pt-BR')}`]], { origin: `A${r}` });
+  const sTit = () => ({
+    font: { name:'Arial', sz:14, bold:true, color:{ rgb: C_BRANCO } },
+    fill: { fgColor:{ rgb: C_AZUL } },
+    alignment: { horizontal:'left', vertical:'center' },
+    border: BORDA
+  });
 
-  ws['!cols'] = [{ wch: 35 }, { wch: 14 }, { wch: 16 }, { wch: 18 }];
-  XLSX.utils.book_append_sheet(wb, ws, 'RESUMO');
+  const sCell = (bold, bg, align) => ({
+    font: { name:'Arial', sz:10, bold:!!bold, color:{ rgb:'FF222222' } },
+    fill: { fgColor:{ rgb: bg||C_BRANCO } },
+    alignment: { horizontal: align||'left', vertical:'center', wrapText:true },
+    border: BORDA
+  });
 
-  data.tipologias.forEach(tip => {
-    const tipWs = XLSX.utils.aoa_to_sheet([
-      [tip.nome + ' — Enxoval Detalhado'],
-      [],
-      ['ITEM', 'QTD TOTAL', 'R$ UNITÁRIO', 'R$ TOTAL']
-    ]);
+  const sNum = (bold, bg) => ({
+    font: { name:'Arial', sz:10, bold:!!bold, color:{ rgb:'FF222222' } },
+    fill: { fgColor:{ rgb: bg||C_BRANCO } },
+    alignment: { horizontal:'right', vertical:'center' },
+    border: BORDA,
+    numFmt: '#,##0'
+  });
 
-    let tr = 4;
-    tip.itens.forEach(item => {
-      XLSX.utils.sheet_add_aoa(tipWs, [[item.item, item.qtd, item.preco, item.total]], { origin: `A${tr}` });
-      tr++;
+  const sBRL = (bold, bg) => ({
+    font: { name:'Arial', sz:10, bold:!!bold, color:{ rgb:'FF222222' } },
+    fill: { fgColor:{ rgb: bg||C_BRANCO } },
+    alignment: { horizontal:'right', vertical:'center' },
+    border: BORDA,
+    numFmt: 'R$\\ #,##0.00'
+  });
+
+  const sSecao = () => ({
+    font: { name:'Arial', sz:11, bold:true, color:{ rgb: C_BRANCO } },
+    fill: { fgColor:{ rgb: C_LARANJA } },
+    alignment: { horizontal:'left', vertical:'center' },
+    border: BORDA
+  });
+
+  const sSubtotal = () => ({
+    font: { name:'Arial', sz:10, bold:true, color:{ rgb: C_BRANCO } },
+    fill: { fgColor:{ rgb: C_AZUL } },
+    alignment: { horizontal:'right', vertical:'center' },
+    border: BORDA,
+    numFmt: 'R$\\ #,##0.00'
+  });
+
+  const sTotal = () => ({
+    font: { name:'Arial', sz:12, bold:true, color:{ rgb: C_BRANCO } },
+    fill: { fgColor:{ rgb: C_LARANJA } },
+    alignment: { horizontal:'right', vertical:'center' },
+    border: BORDA_MED,
+    numFmt: 'R$\\ #,##0.00'
+  });
+
+  const sEditavel = () => ({
+    font: { name:'Arial', sz:10, bold:false, color:{ rgb:'FF191346' } },
+    fill: { fgColor:{ rgb: C_AMARELO } },
+    alignment: { horizontal:'right', vertical:'center' },
+    border: BORDA,
+    numFmt: '#,##0'
+  });
+
+  const sLabel = (bold) => ({
+    font: { name:'Arial', sz:10, bold:!!bold, color:{ rgb:'FF191346' } },
+    fill: { fgColor:{ rgb: C_CINZA } },
+    alignment: { horizontal:'left', vertical:'center' },
+    border: BORDA
+  });
+
+  // ── FUNÇÃO ABA TIPOLOGIA ──
+  function criarAbaTipologia(nomeAba, nomeTip, tip) {
+    const ws = {};
+    const merges = [];
+    let r = 1;
+
+    // Título
+    sc(ws, `A${r}`, `xtay  |  Calculadora de Enxoval — ${nomeTip}`, sTit());
+    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:5} });
+    r += 2;
+
+    // Entradas
+    sc(ws, `A${r}`, `▶  Quantidade de apartamentos ${nomeTip}`, sLabel(true));
+    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:2} });
+    sc(ws, `D${r}`, tip.aptos||0, sEditavel());
+    r++;
+
+    sc(ws, `A${r}`, '▶  Quantidade de banheiros por apartamento', sLabel(true));
+    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:2} });
+    sc(ws, `D${r}`, tip.banheiros||1, sEditavel());
+    sc(ws, `E${r}`, 'banheiros/apto', sLabel(false));
+    merges.push({ s:{r:r-1,c:4}, e:{r:r-1,c:5} });
+    r += 2;
+
+    // Função para bloco de cama
+    function blocoItens(emoji, titulo, qtdCama, adultos, itens, subtotalLabel) {
+      // Seção header
+      sc(ws, `A${r}`, `${emoji}  ${titulo}`, sSecao());
+      merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:5} });
+      r++;
+
+      // Linha qtd cama
+      sc(ws, `A${r}`, `Qtd. ${titulo.split(' ').slice(0,2).join(' ')} por apartamento:`, sLabel(false));
+      merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:0} });
+      sc(ws, `B${r}`, qtdCama||0, sEditavel());
+      sc(ws, `C${r}`, `${adultos} adulto(s)`, sLabel(false));
+      sc(ws, `D${r}`, (qtdCama||0)*(tip.aptos||0), sNum(false, C_AZUL_CL));
+      sc(ws, `E${r}`, 'Total camas', sLabel(false));
+      merges.push({ s:{r:r-1,c:4}, e:{r:r-1,c:5} });
+      r++;
+
+      // Cabeçalho colunas
+      ['Item de Enxoval','Qtd./cama','Giro','Qtd. Total','R$ Unit.','R$ Total'].forEach((h,i) => {
+        sc(ws, String.fromCharCode(65+i)+r, h, sHdr(C_AZUL));
+      });
+      r++;
+
+      // Itens
+      let subtotalVal = 0;
+      itens.forEach((item, idx) => {
+        const bg = idx%2===0 ? C_BRANCO : C_CINZA;
+        sc(ws, `A${r}`, item.item, sCell(false, bg));
+        sc(ws, `B${r}`, item.qtd_por_unidade||1, sNum(false, bg));
+        sc(ws, `C${r}`, item.giro||1, sNum(false, bg));
+        sc(ws, `D${r}`, item.qtd||0, sNum(false, C_AZUL_CL));
+        sc(ws, `E${r}`, item.unitario||0, sBRL(false, bg));
+        sc(ws, `F${r}`, item.total||0, sBRL(false, C_AZUL_CL));
+        subtotalVal += (item.total||0);
+        r++;
+      });
+
+      // Subtotal
+      sc(ws, `A${r}`, `Subtotal — ${subtotalLabel}`, sLabel(true));
+      merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:3} });
+      sc(ws, `E${r}`, 'Subtotal', sLabel(true));
+      sc(ws, `F${r}`, subtotalVal, sSubtotal());
+      r += 2;
+    }
+
+    // CAMA QUEEN
+    const itensQueen = [
+      { item:'PROTETOR COLCHÃO QUEEN', qtd_por_unidade:1, giro:1.2, qtd:Math.round(1*(tip.queen||0)*(tip.aptos||0)*1.2), unitario:76, total:Math.round(1*(tip.queen||0)*(tip.aptos||0)*1.2)*76 },
+      { item:'LENÇOL QUEEN',           qtd_por_unidade:2, giro:3,   qtd:Math.round(2*(tip.queen||0)*(tip.aptos||0)*3),   unitario:60, total:Math.round(2*(tip.queen||0)*(tip.aptos||0)*3)*60 },
+      { item:'EDREDON QUEEN',          qtd_por_unidade:1, giro:1.2, qtd:Math.round(1*(tip.queen||0)*(tip.aptos||0)*1.2), unitario:180,total:Math.round(1*(tip.queen||0)*(tip.aptos||0)*1.2)*180 },
+      { item:'CAPA EDREDON QUEEN',     qtd_por_unidade:1, giro:3,   qtd:Math.round(1*(tip.queen||0)*(tip.aptos||0)*3),   unitario:130,total:Math.round(1*(tip.queen||0)*(tip.aptos||0)*3)*130 },
+      { item:'COBERTOR QUEEN',         qtd_por_unidade:1, giro:1.2, qtd:Math.round(1*(tip.queen||0)*(tip.aptos||0)*1.2), unitario:130,total:Math.round(1*(tip.queen||0)*(tip.aptos||0)*1.2)*130 },
+      { item:'TRAVESSEIRO',            qtd_por_unidade:2, giro:1.2, qtd:Math.round(2*(tip.queen||0)*(tip.aptos||0)*1.2), unitario:75, total:Math.round(2*(tip.queen||0)*(tip.aptos||0)*1.2)*75 },
+      { item:'PROTETOR TRAVESSEIRO',   qtd_por_unidade:2, giro:1.2, qtd:Math.round(2*(tip.queen||0)*(tip.aptos||0)*1.2), unitario:13, total:Math.round(2*(tip.queen||0)*(tip.aptos||0)*1.2)*13 },
+      { item:'FRONHA',                 qtd_por_unidade:2, giro:3,   qtd:Math.round(2*(tip.queen||0)*(tip.aptos||0)*3),   unitario:12, total:Math.round(2*(tip.queen||0)*(tip.aptos||0)*3)*12 },
+    ];
+    blocoItens('🛏️', 'CAMA QUEEN', tip.queen||0, 2, itensQueen, 'CAMA QUEEN');
+
+    // CAMA SOLTEIRO
+    const itensSolteiro = [
+      { item:'PROTETOR COLCHÃO SOLTEIRO', qtd_por_unidade:1, giro:1.2, qtd:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*1.2), unitario:76, total:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*1.2)*76 },
+      { item:'LENÇOL SOLTEIRO',           qtd_por_unidade:2, giro:3,   qtd:Math.round(2*(tip.solteiro||0)*(tip.aptos||0)*3),   unitario:60, total:Math.round(2*(tip.solteiro||0)*(tip.aptos||0)*3)*60 },
+      { item:'EDREDON SOLTEIRO',          qtd_por_unidade:1, giro:1.2, qtd:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*1.2), unitario:180,total:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*1.2)*180 },
+      { item:'CAPA EDREDON SOLTEIRO',     qtd_por_unidade:1, giro:3,   qtd:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*3),   unitario:130,total:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*3)*130 },
+      { item:'COBERTOR SOLTEIRO',         qtd_por_unidade:1, giro:1.2, qtd:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*1.2), unitario:130,total:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*1.2)*130 },
+      { item:'TRAVESSEIRO',               qtd_por_unidade:1, giro:1.2, qtd:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*1.2), unitario:75, total:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*1.2)*75 },
+      { item:'PROTETOR TRAVESSEIRO',      qtd_por_unidade:1, giro:1.2, qtd:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*1.2), unitario:13, total:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*1.2)*13 },
+      { item:'FRONHA',                    qtd_por_unidade:1, giro:3,   qtd:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*3),   unitario:12, total:Math.round(1*(tip.solteiro||0)*(tip.aptos||0)*3)*12 },
+    ];
+    blocoItens('🛏️', 'CAMA SOLTEIRO', tip.solteiro||0, 1, itensSolteiro, 'CAMA SOLTEIRO');
+
+    // SOFÁ CAMA
+    const itensSofa = [
+      { item:'LENÇOL SOFÁ CAMA',       qtd_por_unidade:2, giro:3,   qtd:Math.round(2*(tip.sofa||0)*(tip.aptos||0)*3),   unitario:60, total:Math.round(2*(tip.sofa||0)*(tip.aptos||0)*3)*60 },
+      { item:'COBERTOR SOFÁ CAMA',     qtd_por_unidade:1, giro:1.2, qtd:Math.round(1*(tip.sofa||0)*(tip.aptos||0)*1.2), unitario:130,total:Math.round(1*(tip.sofa||0)*(tip.aptos||0)*1.2)*130 },
+      { item:'TRAVESSEIRO',            qtd_por_unidade:1, giro:1.2, qtd:Math.round(1*(tip.sofa||0)*(tip.aptos||0)*1.2), unitario:75, total:Math.round(1*(tip.sofa||0)*(tip.aptos||0)*1.2)*75 },
+      { item:'PROTETOR TRAVESSEIRO',   qtd_por_unidade:1, giro:1.2, qtd:Math.round(1*(tip.sofa||0)*(tip.aptos||0)*1.2), unitario:13, total:Math.round(1*(tip.sofa||0)*(tip.aptos||0)*1.2)*13 },
+      { item:'FRONHA',                 qtd_por_unidade:1, giro:3,   qtd:Math.round(1*(tip.sofa||0)*(tip.aptos||0)*3),   unitario:12, total:Math.round(1*(tip.sofa||0)*(tip.aptos||0)*3)*12 },
+    ];
+    blocoItens('🛋️', 'SOFÁ CAMA', tip.sofa||0, 2, itensSofa, 'SOFÁ CAMA');
+
+    // BANHEIRO
+    const maxPessoas = ((tip.queen||0)*2) + ((tip.solteiro||0)*1) + ((tip.sofa||0)*2);
+    sc(ws, `A${r}`, '🚿  BANHEIRO', sSecao());
+    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:5} });
+    r++;
+    ['Item','Qtd./pessoa ou Qtd./banheiro','Giro','Qtd. Total','R$ Unit.','R$ Total'].forEach((h,i) => {
+      sc(ws, String.fromCharCode(65+i)+r, h, sHdr(C_AZUL));
+    });
+    r++;
+    const itensBanho = [
+      { item:'TOALHA ROSTO', base: maxPessoas*(tip.aptos||0), giro:3, unitario:18 },
+      { item:'TOALHA BANHO', base: maxPessoas*(tip.aptos||0), giro:3, unitario:56 },
+      { item:'TOALHA PISO',  base: (tip.banheiros||1)*(tip.aptos||0), giro:3, unitario:17 },
+    ];
+    let subtotalBanho = 0;
+    itensBanho.forEach((item, idx) => {
+      const bg = idx%2===0 ? C_BRANCO : C_CINZA;
+      const qtd = Math.round(item.base * item.giro);
+      const total = qtd * item.unitario;
+      subtotalBanho += total;
+      sc(ws, `A${r}`, item.item, sCell(false, bg));
+      sc(ws, `B${r}`, 1, sNum(false, bg));
+      sc(ws, `C${r}`, item.giro, sNum(false, bg));
+      sc(ws, `D${r}`, qtd, sNum(false, C_AZUL_CL));
+      sc(ws, `E${r}`, item.unitario, sBRL(false, bg));
+      sc(ws, `F${r}`, total, sBRL(false, C_AZUL_CL));
+      r++;
+    });
+    sc(ws, `A${r}`, 'Subtotal — Banheiro', sLabel(true));
+    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:3} });
+    sc(ws, `E${r}`, 'Subtotal', sLabel(true));
+    sc(ws, `F${r}`, subtotalBanho, sSubtotal());
+    r += 2;
+
+    // INVESTIMENTO TOTAL
+    const totalTip = tip.subtotal || 0;
+    sc(ws, `A${r}`, `💰  INVESTIMENTO TOTAL — ${nomeTip}`, sTotal());
+    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:4} });
+    sc(ws, `F${r}`, totalTip, sTotal());
+
+    ws['!merges'] = merges;
+    ws['!ref'] = `A1:F${r}`;
+    ws['!cols'] = [{wch:34},{wch:14},{wch:8},{wch:12},{wch:12},{wch:16}];
+    ws['!rows'] = Array(r).fill({hpt:20});
+
+    XLSX.utils.book_append_sheet(wb, ws, nomeAba);
+  }
+
+  // ── ABA RESUMO (formato V10) ──
+  (function() {
+    const ws = {};
+    const merges = [];
+    let r = 1;
+
+    sc(ws, `A${r}`, 'xtay  |  Resumo Consolidado — Calculadora de Enxoval', sTit());
+    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:10} });
+    r += 2;
+
+    // Cabeçalho com tipologias
+    sc(ws, `A${r}`, 'Item de Enxoval', sHdr(C_AZUL));
+    const tips = data.tipologias || [];
+    const tipNames = tips.map(t => t.nome);
+    tipNames.forEach((tn, i) => {
+      sc(ws, String.fromCharCode(66+i*2)+r, tn, sHdr(C_LARANJA));
+      merges.push({ s:{r:r-1,c:1+i*2}, e:{r:r-1,c:2+i*2} });
+    });
+    const colTotal = 1 + tipNames.length*2 + 1;
+    sc(ws, String.fromCharCode(65+colTotal)+r, 'TOTAL GERAL', sHdr(C_AZUL));
+    merges.push({ s:{r:r-1,c:colTotal}, e:{r:r-1,c:colTotal+1} });
+    r++;
+
+    // Sub-cabeçalho Qtd / R$ Total
+    sc(ws, `A${r}`, '', sCell(false, C_CINZA));
+    tipNames.forEach((tn, i) => {
+      sc(ws, String.fromCharCode(66+i*2)+r, 'Qtd.', sHdr(C_AZUL));
+      sc(ws, String.fromCharCode(67+i*2)+r, 'R$ Total', sHdr(C_AZUL));
+    });
+    sc(ws, String.fromCharCode(65+colTotal)+r, 'Qtd.', sHdr(C_AZUL));
+    sc(ws, String.fromCharCode(66+colTotal)+r, 'R$ Total', sHdr(C_AZUL));
+    r++;
+
+    // Linha qtd aptos
+    sc(ws, `A${r}`, 'Qtd. de Apartamentos', sLabel(true));
+    let totalAptos = 0;
+    tipNames.forEach((tn, i) => {
+      const t = tips[i];
+      sc(ws, String.fromCharCode(66+i*2)+r, t.aptos||0, sNum(false, C_CINZA));
+      sc(ws, String.fromCharCode(67+i*2)+r, 0, sNum(false, C_CINZA));
+      totalAptos += (t.aptos||0);
+    });
+    sc(ws, String.fromCharCode(65+colTotal)+r, totalAptos, sNum(true, C_AZUL_CL));
+    sc(ws, String.fromCharCode(66+colTotal)+r, 0, sNum(true, C_AZUL_CL));
+    r++;
+
+    // Seções de itens
+    const secoes = [
+      { label:'🛏️  CAMA QUEEN', itens:['PROTETOR COLCHÃO QUEEN','LENÇOL QUEEN','EDREDON QUEEN','CAPA EDREDON QUEEN','COBERTOR QUEEN'], sub:'Subtotal — Cama Queen' },
+      { label:'🛏️  CAMA SOLTEIRO', itens:['PROTETOR COLCHÃO SOLTEIRO','LENÇOL SOLTEIRO','EDREDON SOLTEIRO','CAPA EDREDON SOLTEIRO','COBERTOR SOLTEIRO'], sub:'Subtotal — Cama Solteiro' },
+      { label:'🛏️  TRAVESSEIROS E FRONHAS', itens:['TRAVESSEIRO','PROTETOR TRAVESSEIRO','FRONHA'], sub:'Subtotal — Travesseiros e Fronhas' },
+      { label:'🛋️  SOFÁ CAMA', itens:['LENÇOL SOFÁ CAMA','COBERTOR SOFÁ CAMA'], sub:'Subtotal — Sofá Cama' },
+      { label:'🚿  BANHEIRO', itens:['TOALHA ROSTO','TOALHA BANHO','TOALHA PISO'], sub:'Subtotal — Banheiro' },
+    ];
+
+    secoes.forEach(sec => {
+      // Label seção
+      sc(ws, `A${r}`, sec.label, sSecao());
+      merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:colTotal+1} });
+      r++;
+
+      let subQtds = tipNames.map(()=>0);
+      let subTotais = tipNames.map(()=>0);
+      let subQtdTotal = 0, subValTotal = 0;
+
+      sec.itens.forEach((itemNome, idx) => {
+        const bg = idx%2===0 ? C_BRANCO : C_CINZA;
+        sc(ws, `A${r}`, itemNome, sCell(false, bg));
+        let qtdGeral = 0, valGeral = 0;
+        tipNames.forEach((tn, i) => {
+          const resumoItem = (data.resumo||[]).find(ri => ri.item === itemNome && ri.tipologia === tn) ||
+            (() => {
+              // recalcular do JSON da tipologia
+              const t = tips[i];
+              const unid = { 
+                'PROTETOR COLCHÃO QUEEN':{ qpu:1, g:1.2, cama:'queen', u:76 },
+                'LENÇOL QUEEN':{ qpu:2, g:3, cama:'queen', u:60 },
+                'EDREDON QUEEN':{ qpu:1, g:1.2, cama:'queen', u:180 },
+                'CAPA EDREDON QUEEN':{ qpu:1, g:3, cama:'queen', u:130 },
+                'COBERTOR QUEEN':{ qpu:1, g:1.2, cama:'queen', u:130 },
+                'PROTETOR COLCHÃO SOLTEIRO':{ qpu:1, g:1.2, cama:'solteiro', u:76 },
+                'LENÇOL SOLTEIRO':{ qpu:2, g:3, cama:'solteiro', u:60 },
+                'EDREDON SOLTEIRO':{ qpu:1, g:1.2, cama:'solteiro', u:180 },
+                'CAPA EDREDON SOLTEIRO':{ qpu:1, g:3, cama:'solteiro', u:130 },
+                'COBERTOR SOLTEIRO':{ qpu:1, g:1.2, cama:'solteiro', u:130 },
+                'TRAVESSEIRO':{ qpu:2, g:1.2, cama:'queen', u:75 },
+                'PROTETOR TRAVESSEIRO':{ qpu:2, g:1.2, cama:'queen', u:13 },
+                'FRONHA':{ qpu:2, g:3, cama:'queen', u:12 },
+                'LENÇOL SOFÁ CAMA':{ qpu:2, g:3, cama:'sofa', u:60 },
+                'COBERTOR SOFÁ CAMA':{ qpu:1, g:1.2, cama:'sofa', u:130 },
+                'TOALHA ROSTO':{ qpu:1, g:3, cama:'banho_pessoa', u:18 },
+                'TOALHA BANHO':{ qpu:1, g:3, cama:'banho_pessoa', u:56 },
+                'TOALHA PISO':{ qpu:1, g:3, cama:'banho_piso', u:17 },
+              }[itemNome] || { qpu:1, g:1, cama:'queen', u:0 };
+              let base = 0;
+              if (unid.cama === 'queen') base = unid.qpu*(t.queen||0)*(t.aptos||0);
+              else if (unid.cama === 'solteiro') base = unid.qpu*(t.solteiro||0)*(t.aptos||0);
+              else if (unid.cama === 'sofa') base = unid.qpu*(t.sofa||0)*(t.aptos||0);
+              else if (unid.cama === 'banho_pessoa') base = ((t.queen||0)*2+(t.solteiro||0)*1+(t.sofa||0)*2)*(t.aptos||0);
+              else if (unid.cama === 'banho_piso') base = (t.banheiros||1)*(t.aptos||0);
+              const qtd = Math.round(base * unid.g);
+              return { qtd_total: qtd, total: qtd * unid.u };
+            })();
+          const qtd = resumoItem.qtd_total || 0;
+          const val = resumoItem.total || 0;
+          sc(ws, String.fromCharCode(66+i*2)+r, qtd, sNum(false, bg));
+          sc(ws, String.fromCharCode(67+i*2)+r, val, sBRL(false, bg));
+          subQtds[i] += qtd;
+          subTotais[i] += val;
+          qtdGeral += qtd;
+          valGeral += val;
+        });
+        sc(ws, String.fromCharCode(65+colTotal)+r, qtdGeral, sNum(false, C_AZUL_CL));
+        sc(ws, String.fromCharCode(66+colTotal)+r, valGeral, sBRL(false, C_AZUL_CL));
+        subQtdTotal += qtdGeral;
+        subValTotal += valGeral;
+        r++;
+      });
+
+      // Subtotal seção
+      sc(ws, `A${r}`, sec.sub, sCell(true, C_CINZA));
+      tipNames.forEach((tn, i) => {
+        sc(ws, String.fromCharCode(66+i*2)+r, subQtds[i], sNum(true, C_CINZA));
+        sc(ws, String.fromCharCode(67+i*2)+r, subTotais[i], sBRL(true, C_CINZA));
+      });
+      sc(ws, String.fromCharCode(65+colTotal)+r, subQtdTotal, sNum(true, C_AZUL_CL));
+      sc(ws, String.fromCharCode(66+colTotal)+r, subValTotal, sBRL(true, C_AZUL_CL));
+      r++;
     });
 
-    tr++;
-    XLSX.utils.sheet_add_aoa(tipWs, [['SUBTOTAL', '', '', tip.subtotal]], { origin: `A${tr}` });
-    tipWs['!cols'] = [{ wch: 35 }, { wch: 14 }, { wch: 16 }, { wch: 18 }];
-    XLSX.utils.book_append_sheet(wb, tipWs, tip.nome.substring(0, 31));
+    r++;
+    // Total etiquetas
+    sc(ws, `A${r}`, '🏷️  TOTAL DE ETIQUETAS NECESSÁRIAS', sHdr(C_AZUL));
+    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:colTotal-1} });
+    sc(ws, String.fromCharCode(65+colTotal)+r, data.total_pecas||0, sNum(true, C_LARANJA));
+    sc(ws, String.fromCharCode(66+colTotal)+r, 'Qtd. Total de Peças', sCell(true, C_LARANJA));
+    r++;
+
+    // Investimento total
+    sc(ws, `A${r}`, '💰  INVESTIMENTO TOTAL', sHdr(C_LARANJA));
+    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:0} });
+    tipNames.forEach((tn, i) => {
+      const t = tips[i];
+      sc(ws, String.fromCharCode(66+i*2)+r, '', sCell(false, C_CINZA));
+      sc(ws, String.fromCharCode(67+i*2)+r, t.subtotal||0, sTotal());
+    });
+    sc(ws, String.fromCharCode(65+colTotal)+r, 'TOTAL', sHdr(C_AZUL));
+    sc(ws, String.fromCharCode(66+colTotal)+r, data.total_investimento||0, sTotal());
+
+    ws['!merges'] = merges;
+    ws['!ref'] = `A1:${String.fromCharCode(65+colTotal+1)}${r}`;
+    const cols = [{wch:32}];
+    tipNames.forEach(()=>{ cols.push({wch:10}); cols.push({wch:16}); });
+    cols.push({wch:10}); cols.push({wch:16});
+    ws['!cols'] = cols;
+    ws['!rows'] = Array(r).fill({hpt:20});
+
+    XLSX.utils.book_append_sheet(wb, ws, '📊 RESUMO');
+  })();
+
+  // ── ABAS TIPOLOGIA ──
+  const tipMap = { 'STUDIO':'Studio', '1DORM':'1 Dormitório', '2DORM':'2 Dormitórios', '3DORM':'3 Dormitórios' };
+  (data.tipologias || []).forEach(tip => {
+    const nomeTip = tipMap[tip.nome] || tip.nome;
+    criarAbaTipologia(tip.nome, nomeTip, tip);
   });
 
-  XLSX.writeFile(wb, 'Enxoval_Xtay.xlsx');
+  // ── ABA DADOS ──
+  (function() {
+    const ws = {};
+    const merges = [];
+    let r = 1;
+
+    sc(ws, `A${r}`, 'xtay  |  Tabela de Referência — Itens de Enxoval', sTit());
+    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:7} });
+    r += 2;
+
+    ['Item','Padrão','Fios / Gramas','Medidas','Especificação','Tipo','R$ Unitário','Giro'].forEach((h,i) => {
+      sc(ws, String.fromCharCode(65+i)+r, h, sHdr(C_AZUL));
+    });
+    r++;
+
+    const dados = [
+      ['CAPA EDREDON QUEEN','PERCAL','200','2,45x2,65','—','QUEEN',130,3],
+      ['CAPA EDREDON SOLTEIRO','PERCAL','200','1,75x2,45','—','SOLTEIRO',130,3],
+      ['COBERTOR QUEEN','ANTI PILLING','300GR/M²','2,20x2,40','MICROFIBRA SOFT','QUEEN',130,1.2],
+      ['COBERTOR SOFÁ CAMA','ANTI PILLING','300GR/M²','2,20x2,40','MICROFIBRA SOFT','SOFÁ CAMA',130,1.2],
+      ['COBERTOR SOLTEIRO','ANTI PILLING','300GR/M²','1,60x2,20','MICROFIBRA SOFT','SOLTEIRO',130,1.2],
+      ['EDREDON QUEEN','PERCAL','200','2,40x2,60','—','QUEEN',180,1.2],
+      ['EDREDON SOLTEIRO','PERCAL','200','1,70x2,40','—','SOLTEIRO',180,1.2],
+      ['FRONHA','PERCAL','200','0,50x0,80','GAVETA / 2 ABAS','TRAVESSEIRO',12,3],
+      ['LENÇOL QUEEN','PERCAL','200','2,50x2,80','—','QUEEN',60,3],
+      ['LENÇOL SOFÁ CAMA','PERCAL','200','2,50x2,80','—','SOFÁ CAMA',60,3],
+      ['LENÇOL SOLTEIRO','PERCAL','200','2,00x2,80','—','SOLTEIRO',60,3],
+      ['PROTETOR COLCHÃO QUEEN','PERCAL','200','1,60x2,00','PERMEÁVEL / ALÇAS','QUEEN',76,1.2],
+      ['PROTETOR COLCHÃO SOLTEIRO','PERCAL','200','0,90x2,00','PERMEÁVEL / ALÇAS','SOLTEIRO',76,1.2],
+      ['PROTETOR TRAVESSEIRO','PERCAL','200','0,55x0,85','IMPERMEÁVEL','TRAVESSEIRO',13,1.2],
+      ['TOALHA BANHO','SUMMIT','500GR/M²','0,75x1,40','—','BANHO',56,3],
+      ['TOALHA PISO','SUMMIT','500GR/M²','0,50x0,80','—','BANHO',17,3],
+      ['TOALHA ROSTO','SUMMIT','500GR/M²','0,50x0,80','—','BANHO',18,3],
+      ['TRAVESSEIRO','PERCAL','180','0,50x0,80','FIBRA SILICONIZADA','TRAVESSEIRO',75,1.2],
+    ];
+
+    dados.forEach((row, idx) => {
+      const bg = idx%2===0 ? C_BRANCO : C_CINZA;
+      row.forEach((val, i) => {
+        const isEdit = i === 6 || i === 7;
+        const style = isEdit ? sEditavel() : sCell(false, bg);
+        if (isEdit) { style.fill = { fgColor:{ rgb: C_AMARELO } }; }
+        sc(ws, String.fromCharCode(65+i)+r, val, style);
+      });
+      r++;
+    });
+
+    r++;
+    sc(ws, `A${r}`, '⚠️  Células em laranja (R$ Unitário e Giro) podem ser editadas conforme cotação atual.', sLabel(false));
+    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:7} });
+
+    ws['!merges'] = merges;
+    ws['!ref'] = `A1:H${r}`;
+    ws['!cols'] = [{wch:28},{wch:16},{wch:12},{wch:12},{wch:20},{wch:12},{wch:12},{wch:8}];
+    ws['!rows'] = Array(r).fill({hpt:20});
+
+    XLSX.utils.book_append_sheet(wb, ws, '📊 DADOS');
+  })();
+
+  // ── FORNECEDORES ──
+  (function() {
+    const ws = {};
+    const merges = [];
+    let r = 1;
+    sc(ws, `A${r}`, 'xtay  |  Fornecedores Oficiais', sTit());
+    merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:3} });
+    r += 2;
+    [['Maxlink Têxtil','www.maxlink.com.br','Ernesto','+55 11 99203-7376'],
+     ['Altenburg Linha Hotel','www.altenburg.com.br/linha-hotel','Rui','+55 47 9982-7715']].forEach(([nome,site,contato,fone]) => {
+      sc(ws, `A${r}`, nome, sSecao()); merges.push({ s:{r:r-1,c:0}, e:{r:r-1,c:3} }); r++;
+      [['Site',site],['Contato',contato],['Fone',fone]].forEach(([k,v],i)=>{
+        sc(ws,`A${r}`,k,sLabel(true)); sc(ws,`B${r}`,v,sCell(false, i%2===0?C_CINZA:C_BRANCO));
+        merges.push({ s:{r:r-1,c:1}, e:{r:r-1,c:3} }); r++;
+      });
+      r++;
+    });
+    ws['!merges'] = merges;
+    ws['!ref'] = `A1:D${r}`;
+    ws['!cols'] = [{wch:18},{wch:38},{wch:15},{wch:18}];
+    XLSX.utils.book_append_sheet(wb, ws, '🏭 FORNECEDORES');
+  })();
+
+  const nome = (data.empreendimento || 'Enxoval_Xtay')
+    .replace(/[^a-zA-Z0-9_\-\u00C0-\u017E ]/g,'').trim().replace(/ /g,'_');
+  XLSX.writeFile(wb, `Calculadora_Enxoval_Xtay_${nome}.xlsx`);
+}
+
+async function callAPI(userText) {
+  history.push({ role: 'user', content: userText });
+  document.getElementById('sendBtn').disabled = true;
+  showTyping();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        system: SYSTEM_PROMPT,
+        messages: history
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      removeTyping();
+      addMessage('bot', '⚠️ Erro na API: ' + (data.error.message || 'Tente novamente.'));
+    } else {
+      const reply = data.content?.[0]?.text || 'Não foi possível processar.';
+      history.push({ role: 'assistant', content: reply });
+      removeTyping();
+      const excelData = extractExcelData(reply);
+      addMessage('bot', reply, excelData ? () => gerarExcel(excelData) : null);
+    }
+  } catch(e) {
+    removeTyping();
+    addMessage('bot', '⚠️ Erro de conexão. Verifique sua internet e tente novamente.');
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('inp').focus();
 }
 
 function sendMessage() {
@@ -500,26 +941,17 @@ function sendMessage() {
   addMessage('user', text);
   inp.value = '';
   inp.style.height = '';
-
-  setTimeout(() => {
-    const { msg, excel } = processar(text);
-    addMessage('bot', msg, excel ? () => gerarExcel(excel) : null);
-  }, 300);
+  callAPI(text);
 }
 
 function sendChip(text) {
   hideChips();
   addMessage('user', text);
-
-  setTimeout(() => {
-    const { msg, excel } = processar(text);
-    addMessage('bot', msg, excel ? () => gerarExcel(excel) : null);
-  }, 300);
+  callAPI(text);
 }
 
 // Boas-vindas
-addMessage('bot', `👋 Olá! Sou a **Calculadora de Enxoval Xtay**.\n\nPosso te ajudar a dimensionar o enxoval completo do seu empreendimento — quantidade de peças, investimento estimado e geração automática da **planilha Excel** com todos os detalhes.\n\nUse os atalhos abaixo ou descreva o empreendimento para começar!`);
+addMessage('bot', `Olá! 👋 Sou a **Calculadora de Enxoval Xtay**.\n\nPosso te ajudar a dimensionar o enxoval completo do seu empreendimento — quantidade de peças, investimento estimado e geração automática da **planilha Excel** com todos os detalhes.\n\nUse os atalhos abaixo ou descreva o empreendimento para começar!`);
 </script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </body>
 </html>
